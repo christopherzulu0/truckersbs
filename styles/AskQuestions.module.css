@@ -1,0 +1,154 @@
+
+.mainBody{
+    margin: 1% 10%;
+}
+.box0{
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.12); 
+    padding-bottom: 3%;    
+}
+.box1{
+    background-color: #748AA1;
+    padding: 5%;
+    color: #fff;
+}
+.heading1{
+    font-size: 40px
+}
+.iconBar{
+    margin-top: 2%;
+    display: flex;
+
+}
+.icon1{
+    margin-right: 5%;
+}
+.icon2{
+    margin-right: 5%;
+}
+.box2{
+    padding: 5%;
+}
+.nameBox{
+    background-color: rgb(30, 30, 245);
+    color: #fff;
+    padding: 1%;
+    margin: 1%;
+    border-radius: 50%;
+}
+.queryInput{
+    width: 80%;
+    background: #FFFFFF;
+    padding: 0.5% 2%;
+    margin-right: 1%;
+    border: 1px solid #DAE0E6;
+    border-radius: 15px;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.12);    
+}
+.box3{
+    display: flex;
+    padding: 0.1% 10%;
+    
+}
+.ask{
+    margin-right: 5%;
+}
+.answer{
+    margin-right: 5%;
+}
+.post{
+    margin-right: 5%;
+}
+
+/* Main Content Box  */
+.contentBox{
+    display: flex;
+}
+
+/* Content Box1  */
+.contentBox1{
+    width: 90%;
+    margin-right: 1%;
+    
+}
+.heading2{
+    font-size: 30px;
+    font-weight: 600;
+    margin-top: 2%;
+}
+.subBox1{
+    display: flex;
+    padding: 3%;
+    height: 25vh;
+    width: 100%;
+    border: 2px solid #DAE0E6;
+    margin-top: 1%;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.12); 
+    
+}
+.subBox1A{
+    width: 40%;
+    
+}
+.text1B{
+    margin-left: 11%;
+}
+.topicCount{
+    margin-left: 4%;
+    text-align: center;
+}
+.RepliesCount{
+    text-align: center;
+}
+.vertical{
+    margin: 0.2% 2%;
+    width: 0.2%;
+    background-color: #DAE0E6;
+}
+
+/*  */
+.subBox1B{
+    display: flex;
+    margin-left: 4%;
+}
+.img1{
+    width: 30%;
+    height: 10vh;
+    border-radius: 50%;
+    margin-right: 2%;
+}
+.nameBox2{
+    text-align: center;
+    margin-left: 3%;
+}
+.nameText2{
+    font-weight: 600;
+}
+.textA{
+    font-weight: 600;
+}
+.textB{
+    color: #aeafaf;
+}
+
+/* Content Box2 */
+.contentBox2{
+    width: 30%;
+    padding: 2%;
+    margin-top: 6.5%;
+    border: 2px solid #DAE0E6;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.12); 
+}
+.textC{
+    color: #aeafaf;
+    margin-left: 2%;
+}
+.heading3{
+    padding: 1%;
+    font-weight: 600;
+}
+.label3{
+    margin-right: 25%;
+}
+.tab{
+    margin-left: 28%;
+}

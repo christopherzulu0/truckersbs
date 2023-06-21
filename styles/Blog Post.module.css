@@ -1,0 +1,63 @@
+.body{
+    margin-left: 5%;
+    margin-right: 5%;
+    margin-bottom: 3%;
+}
+/*  */
+.backBtn{
+    font-size: 35px;
+    font-weight: 700;
+    color: darkcyan;
+}
+.title{
+    font-size: 25px;
+    padding-left: 1%;
+}
+/*  */
+.heading{
+    font-size: 20px;
+    font-weight: 700;
+}
+/*  */
+.container{
+    display: flex;
+    padding: 2%;
+}
+.img1{
+    width: 90%;
+    height: 70vh;
+    margin-right: 5%;
+    margin-left: 5%;
+}
+.socials{
+    margin-top: 3%;
+}
+.whatsApp{
+    height: 10vh;
+    top: 5%;
+    left: 90%;
+    background-color: #fff;
+    padding: 0.2%;
+    
+}
+.linkedIn{
+    height: 10vh;
+    background-color:white;
+    padding: 0.2%;
+}
+.instagram{
+    height: 10vh;
+    background-color:#fff;
+    padding: 0.2%;
+}
+.facebook{
+    height: 10vh;
+    background-color: #fff;
+    padding: 0.2%;
+}
+/*  */
+.paragraph{
+    font-size: 20px;
+    text-align: justify;
+    padding: 1%;
+}
