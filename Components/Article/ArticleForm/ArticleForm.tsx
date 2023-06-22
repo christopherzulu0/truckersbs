@@ -1,4 +1,4 @@
-import { SetStateAction, useState, useRef, forwardRef } from "react";
+import { SetStateAction, useState, useRef, forwardRef, useEffect } from "react";
 import {
   Button,
   FormControl,
@@ -29,7 +29,7 @@ const CreateArticleForm = forwardRef<HTMLDivElement, CreateArticleFormProps>(
     const [title, setTitle] = useState("");
     const [category, setCategory] = useState("");
     const [description, setDescription] = useState("");
-    const [value, setValue] = useState("");
+    const [showModal, setShowModal] = useState(false);
     const [tags, setTags] = useState<string[]>([]);
     const quillRef = useRef<any>(null);
 
@@ -43,6 +43,7 @@ const CreateArticleForm = forwardRef<HTMLDivElement, CreateArticleFormProps>(
       setTags([]);
       // Close the modal
       onClose();
+      setShowModal(true);
     };
 
     const handleTagChange = (event: { target: { value: string } }) => {
@@ -90,7 +91,21 @@ const CreateArticleForm = forwardRef<HTMLDivElement, CreateArticleFormProps>(
       input.click();
     };
 
+    // show article created modal for 1 second
+    useEffect(() => {
+        if (showModal) {
+          const timer = setTimeout(() => {
+            setShowModal(false);
+          }, 5000);
+    
+          return () => {
+            clearTimeout(timer);
+          };
+        }
+      }, [showModal]);
+
     return (
+    <>
       <Modal isOpen={isOpen} onClose={onClose} size="xl">
         <ModalOverlay />
         <ModalContent>
@@ -151,6 +166,24 @@ const CreateArticleForm = forwardRef<HTMLDivElement, CreateArticleFormProps>(
           </ModalFooter>
         </ModalContent>
       </Modal>
+
+      {showModal && (
+  <Modal isOpen={showModal} onClose={() => setShowModal(false)} size="lg">
+    <ModalOverlay />
+    <ModalContent width={'500px'} height={'300px'} mt={20}>
+      <ModalHeader display="flex" justifyContent="flex-end">
+        <Button variant="unstyled" color={'blue.500'} onClick={() => setShowModal(false)}>
+          <IoIosClose size={24} />
+        </Button>
+      </ModalHeader>
+      <ModalBody textAlign="center" mt={'14'} fontSize={25}>
+        Article created successfully!
+      </ModalBody>
+    </ModalContent>
+  </Modal>
+)}
+
+      </>
     );
   }
 );
