@@ -19,6 +19,7 @@ import {
 import { FaArrowCircleRight } from "react-icons/fa";
 
 import Footer from "../Components/Footer"
+import CreateArticleForm from '@/Components/Article/ArticleForm/ArticleForm';
 
 interface CardProps {
   heading: string;
@@ -28,6 +29,8 @@ interface CardProps {
 }
 
 const Cards = ({heading, description, image,href }: CardProps) => {
+
+
   return (
     <Box
       maxW={{ base: 'full', md: '275px' }}
@@ -64,23 +67,34 @@ const Cards = ({heading, description, image,href }: CardProps) => {
 
 
 export default function Articles() {
+  const [isOpen, setIsOpen] = React.useState(false);
+
+
+
+
+  const onClose = () => {
+    setIsOpen(false);
+  }
   return (
     <>
-      
-      <Heading textAlign={{ base: 'center', md: 'center' }} mx={{ base: 'auto', md: '0' }} mb={{ base: 4, md: 6 }}>Featured</Heading>
-     <Center py={6}>
+    <Container maxW={'5xl'} mt={12} display={'flex'} justifyContent={'flex-start'} flexDirection={'column'}>
+      <Text fontSize={'sm'} fontWeight={'bold'} onClick={() => setIsOpen(true)}>Articles</Text>
+      <CreateArticleForm isOpen={isOpen} onClose={onClose}/>
+      <Heading  textAlign={{ base: 'center', sm: 'center', md: 'left', lg: 'left' }}  mb={{ base: 4, md: 6 }} ml={{base:'0', sm:'0', md: '16', lg:'16' }} >Featured</Heading>
+     <Center>
   <Card
     overflow='hidden'
     variant='outline'
-    flexDirection={{ base: 'column', sm: 'row' }}
-    justifyContent={{ base: 'center', sm: 'space-between' }}
+    marginLeft={{ base: '0', sm: '0', md: '0', lg: '-20' }}
+    flexDirection={{ base:'column', sm: 'column', md:'row', lg:'row'}}
+    justifyContent={{ base: 'center', sm: 'space-between'}}
     alignItems={{ base: 'center', sm: 'stretch' }}
-    width={{ base: '100%', sm: '90%', md: '80%', lg: '60%' }}
+    width={{ base: '100%', sm: '90%', md: '80%', lg: '80%' }}
   >
     <Image
       objectFit='cover'
       height={{ base: '200px', sm: '170px', md: '350px', lg: '350px' }}
-      width={{ base: '100%', sm: '320px', md: '300px', lg: '350px' }}
+      width={{ base: '100%', sm: '100%', md: '350px', lg: '350px' }}
       src='https://images.unsplash.com/photo-1667489022797-ab608913feeb?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHw5fHx8ZW58MHx8fHw%3D&auto=format&fit=crop&w=800&q=60'
       alt='Caffe Latte'
     />
@@ -91,7 +105,10 @@ export default function Articles() {
       p={{ base: '4', sm: '6', md: '8' }}
     >
       <CardBody>
-        <Heading size={{ base: 'md', sm: 'lg', md: 'xl', lg: '2xl' }}>
+        <Heading 
+        size={{ base: 'md', sm: 'lg', md: 'xl', lg: 'xl' }}
+        // textAlign={{ base: 'center', sm: 'center' }}
+        >
           Black Ice In Montreal
         </Heading>
 
@@ -100,19 +117,25 @@ export default function Articles() {
         </Text>
       </CardBody>
 
-      <CardFooter alignSelf={{ base: 'center', sm: 'flex-end' }}>
+      <CardFooter display={'flex'} justifyContent={{ base: 'center'}}>
         <Button variant='solid' colorScheme='blue'>
-          View More<FaArrowCircleRight ml={{ base: '2', sm: '5' }} />
+          View More<FaArrowCircleRight style={{marginLeft: '5px', margin: 'auto'}} />
         </Button>
       </CardFooter>
     </Stack>
   </Card>
 </Center>
+</Container>
 <br/>
 
   <Container maxW={'5xl'} mt={12}>
      
-      <Heading ml={20} mb={5}>Latest Articles</Heading>
+      <Heading
+       ml={{base:'0', sm:'0', md: '20', lg:'20' }} mb={5}
+       textAlign={{ base: 'center', sm: 'center', md: 'left', lg: 'left' }}
+      >
+        Latest Articles
+        </Heading>
  
         <Flex flexWrap="wrap" gridGap={6} justify="center">
               
