@@ -10,10 +10,12 @@ import {
   ModalHeader,
   ModalBody,
   ModalFooter,
+  Box,
 } from "@chakra-ui/react";
 import dynamic from "next/dynamic";
 import "react-quill/dist/quill.snow.css";
 import axios from "axios";
+import { IoIosClose } from "react-icons/io";
 
 const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
 
@@ -27,7 +29,7 @@ const CreateArticleForm = forwardRef<HTMLDivElement, CreateArticleFormProps>(
     const [title, setTitle] = useState("");
     const [category, setCategory] = useState("");
     const [description, setDescription] = useState("");
-    const [value, setValue] = useState('');
+    const [value, setValue] = useState("");
     const [tags, setTags] = useState<string[]>([]);
     const quillRef = useRef<any>(null);
 
@@ -92,8 +94,13 @@ const CreateArticleForm = forwardRef<HTMLDivElement, CreateArticleFormProps>(
       <Modal isOpen={isOpen} onClose={onClose} size="xl">
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Create Article</ModalHeader>
-          <ModalBody>
+            <ModalHeader display={'flex' } justifyContent={'space-between'} width={'100%'} mt={4}>
+                Article
+            <Button variant="unstyled" onClick={onClose} color={"blue.500"}>
+                <IoIosClose size={30}/>
+            </Button>
+                </ModalHeader>
+          <ModalBody maxHeight="400px" overflowY="auto">
             <FormControl mb={4}>
               <FormLabel>Title</FormLabel>
               <Input
@@ -111,23 +118,22 @@ const CreateArticleForm = forwardRef<HTMLDivElement, CreateArticleFormProps>(
               />
             </FormControl>
             <FormControl mb={4}>
-      <FormLabel>Description</FormLabel>
-  
-            <ReactQuill
-  value={description}
-  onChange={handleDescriptionChange}
-  modules={{
-    toolbar: [
-      [{ header: [1, 2, 3, 4, 5, 6, false] }],
-      ['bold', 'italic', 'underline', 'strike'],
-      [{ list: 'ordered' }, { list: 'bullet' }],
-      ['blockquote', 'code-block'],
-      ['link', 'image'],
-    ],
-  }}
-/>
+              <FormLabel>Description</FormLabel>
 
-    </FormControl>
+              <ReactQuill
+                value={description}
+                onChange={handleDescriptionChange}
+                modules={{
+                  toolbar: [
+                    [{ header: [1, 2, 3, 4, 5, 6, false] }],
+                    ["bold", "italic", "underline", "strike"],
+                    [{ list: "ordered" }, { list: "bullet" }],
+                    ["blockquote", "code-block"],
+                    ["link", "image"],
+                  ],
+                }}
+              />
+            </FormControl>
 
             <FormControl mb={4}>
               <FormLabel>Tags</FormLabel>
@@ -138,11 +144,10 @@ const CreateArticleForm = forwardRef<HTMLDivElement, CreateArticleFormProps>(
               />
             </FormControl>
           </ModalBody>
-          <ModalFooter>
+          <ModalFooter  display={'flex' } justifyContent={'flex-start'} width={'100%'}>
             <Button colorScheme="blue" mr={3} onClick={handleCreateArticle}>
               Create
             </Button>
-            <Button onClick={onClose}>Cancel</Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
