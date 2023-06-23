@@ -1,5 +1,16 @@
-import { Center, Grid, GridItem, Container, VStack, Box } from "@chakra-ui/react";
+import {
+  Center,
+  Grid,
+  GridItem,
+  Container,
+  VStack,
+  Box,
+  HStack,
+  Button,
+  Heading,
+} from "@chakra-ui/react";
 import React from "react";
+import Map from "../Components/Map/Map";
 // body {
 //     background-image: url("./images/forest.jpg");
 
@@ -12,11 +23,11 @@ import React from "react";
 const HomePage = () => {
   return (
     <div>
-      
       <VStack>
-       <center>
-       <Container maxW="container.xxl" >
-          <Center
+        <center>
+          <Container
+          mt={50}
+            maxW="container.xxl"
             h="300px"
             color="white"
             w="1308px"
@@ -26,19 +37,23 @@ const HomePage = () => {
             backgroundSize={"cover"}
             backgroundPosition={"center center"}
           >
-            hello
-            {/* <Grid
-          h="295px"
-          templateRows="repeat(2, 1fr)"
-          templateColumns="repeat(5, 1fr)"
-          gap={4}
-          textAlign="center"
-        >
-          <GridItem colSpan={4} bg="tomato" />
-        </Grid> */}
-          </Center>
-        </Container>
-       </center>
+            <Heading as="h2" size="2xl" textAlign="start" mt={50} >
+              Black Ice Montreal
+            </Heading>
+            <Center>
+            
+
+            </Center>
+            <Center>
+              <HStack mt={150}>
+                <Button colorScheme="blue">My Route</Button>
+                <Button colorScheme="blue">My Loads</Button>
+              </HStack>
+            </Center>
+          </Container>
+
+          
+        </center>
       </VStack>
     </div>
   );
