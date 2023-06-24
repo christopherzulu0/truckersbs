@@ -6,10 +6,12 @@ const ArticleFilter = () => {
   return (
     <Box
     width={{base: '100%', sm: '100%', md: '100%', lg: '100%'}}
+    maxW={'full'}
     padding={'2'}
     background={'white'}
     gap={'2'}
     marginTop="180px"
+    // marginLeft={{base: '0', sm: '0', md: '20', lg: '28'}}
     height="700px"
     boxShadow={'md'}
     display={'flex'}

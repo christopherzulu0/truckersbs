@@ -18,7 +18,7 @@ import {
   } from '@chakra-ui/react';
 import { FaArrowCircleRight } from "react-icons/fa";
 
-import Footer from "../Components/Footer"
+import Footer from "../../Components/Footer"
 import CreateArticleForm from '@/Components/Article/ArticleForm/ArticleForm';
 
 interface CardProps {

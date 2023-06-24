@@ -172,8 +172,8 @@ const archives = () => {
     <>
 
   <Container
-        maxW={"5xl"}
-        mt={12}
+        maxW={'6xl'}
+        mt={8}
         display={"flex"}
         flexDirection={"column"}
         gap={'4'}
@@ -186,6 +186,7 @@ const archives = () => {
       </Box>
    <Box 
         width={ { base:'100%', sm:'100%', md:'100%', lg:'100%'} }
+
         mt={4}
         display={"flex"}
         justifyContent={"between"}
@@ -200,6 +201,7 @@ const archives = () => {
     >
       <Container
         width={ { base:'100%', sm:'100%', md:'100%', lg:'100%'} }
+        maxWidth={'full'}
          mt={12}
          display={"flex"}
          justifyContent={"center"}
@@ -225,6 +227,7 @@ const archives = () => {
 
       <Container
         width={ { base:'100%', sm:'100%', md:'100%', lg:'100%'} }
+        maxWidth={'full'}
          mt={12}
          display={"flex"}
          justifyContent={"center"}
@@ -236,6 +239,7 @@ const archives = () => {
 
       <Container
         width={ { base:'100%', sm:'100%', md:'100%', lg:'100%'} }
+        maxWidth={'full'}
          mt={12}
          display={"flex"}
          justifyContent={"center"}
