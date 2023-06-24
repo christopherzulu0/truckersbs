@@ -1,11 +1,9 @@
 import Footer from '@/Components/Footer';
 import { Box, Container, Divider, Flex, Image, Link, Text } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
-import whasapImg from '../../public/images/whatsapp.png';
-import instaImg from '../../public/insta.png';
-import linkedImg from '../../public/images/in.png';
-import fbImg from '../../public/fb.png';
-import DonateComponent from '@/Components/Article/ArticleForm/DonatePopUp';
+import DonateComponent, { ModalPopup } from '@/Components/Article/ArticleForm/DonatePopUp';
+import { useState } from 'react';
+import SubscriptionCard from '@/Components/subscription/Subscription';
 
 
 const articles = [
@@ -76,6 +74,7 @@ const articles = [
 function ArticleDetailsPage() {
   const router = useRouter();
   const { id } = router.query;
+  const [showSubscription, setShowSubscription] = useState(false);
 
   // Find the article based on the ID
   const article = articles.find((article) => article.id === parseInt(id as string, 10));
@@ -83,6 +82,13 @@ function ArticleDetailsPage() {
   if (!article) {
     return <Text>Article not found.</Text>;
   }
+
+  const onClose = () => {
+    setShowSubscription(false);
+  }
+
+  console.log('showSubscription', showSubscription);
+  
 
   return (
     <>
@@ -137,7 +143,12 @@ function ArticleDetailsPage() {
       </Box>
       </Box>
     </Container>
-    <DonateComponent/>
+            {
+              showSubscription && (<ModalPopup isOpen={showSubscription} onClose={onClose}>
+                <SubscriptionCard />
+              </ModalPopup>)
+              }
+    <DonateComponent setShowSubscription={setShowSubscription}/>
     <Footer/>
     </>
   );
