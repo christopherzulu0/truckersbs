@@ -16,15 +16,52 @@ import {
   CardFooter,
   Divider,
   Image,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  useDisclosure,
+  ModalCloseButton,
+  ModalBody,
+  Input,
+  Flex,
+  Spacer,
 } from "@chakra-ui/react";
 import React from "react";
-import { data } from "./api/CardData";
+import { data } from "./CardData";
 import { ArrowForwardIcon } from "@chakra-ui/icons";
 import Footer from "../Components/Footer";
+import { dataCard } from "./CardData";
+import Map from "@/Components/Map/Map";
 
 const HomePage = () => {
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const finalRef = React.useRef(null);
   return (
     <div>
+      <Modal finalFocusRef={finalRef} isOpen={isOpen} onClose={onClose} width="1004px" >
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Modal Title</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+
+            <Map />
+            
+
+            {/* <Lorem count={2} /> */}
+          
+          </ModalBody>
+
+          <ModalFooter>
+            <Button colorScheme="blue" mr={3} onClick={onClose}>
+              Close
+            </Button>
+            <Button variant="ghost">Secondary Action</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
       <VStack>
         <Container
           mt={50}
@@ -43,14 +80,15 @@ const HomePage = () => {
           </Heading>
           <Center></Center>
           <Center>
-            <HStack mt={150}>
-              <Button colorScheme="blue">My Route</Button>
+            <HStack mt={100}>
+              <Button onClick={onOpen} colorScheme="blue">
+                My Route
+              </Button>
               <Button colorScheme="blue">My Loads</Button>
             </HStack>
           </Center>
         </Container>
       </VStack>
-
       <VStack>
         <Container
           mt={50}
@@ -94,7 +132,7 @@ const HomePage = () => {
           w="1308px"
         >
           <Grid templateColumns="repeat(5, 1fr)" gap={6}>
-            {data.map((card) => (
+            {dataCard.map((card) => (
               <GridItem w="300px" h="10" key={card.id}>
                 <Card maxW="sm" mt={5}>
                   <Image
