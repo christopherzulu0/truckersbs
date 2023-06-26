@@ -37,6 +37,11 @@ import { useFormik } from "formik";
 // import { DatePicker, DatePickerInput } from "chakra-datetime-picker";
 
 import { mapSchema, mapValues } from "../validationSchema/map";
+import {
+  planRouteValues,
+  planRouteSchema,
+} from "../validationSchema/planRoute";
+
 const center = { lat: 48.8584, lng: 2.2945 };
 const libraries = ["places"];
 
@@ -47,6 +52,19 @@ export default function Map() {
     onSubmit: (values) => {
       try {
         // console.log("values", values.startTime);
+        alert(JSON.stringify(values, null, 2));
+      } catch (error) {
+        console.log("error", error);
+      }
+    },
+  });
+
+  const formikPlanRoute = useFormik({
+    initialValues: planRouteValues,
+    validationSchema: planRouteSchema,
+    onSubmit: (values) => {
+      try {
+        console.log("values", values);
         alert(JSON.stringify(values, null, 2));
       } catch (error) {
         console.log("error", error);
@@ -261,19 +279,48 @@ export default function Map() {
           <ModalHeader>Route Plan</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <Select placeholder="Hours of Driving">
-              <option value="option1">3 hours</option>
-              <option value="option2">4 hours</option>
-              <option value="option3">5 hours</option>
-            </Select>
-            <br />
-            <Select placeholder="Intermediate Stops">
-              <option value="option1">
-                Quebec Station, 3rd Street, Down Street
-              </option>
-              <option value="option2">Option 2</option>
-              <option value="option3">Option 3</option>
-            </Select>
+            <FormControl
+              isInvalid={
+                !!formikPlanRoute.errors.hours && formikPlanRoute.touched.hours
+              }
+            >
+              <FormLabel htmlFor="Hours of Driving">
+                Hours of Driving
+                <Select
+                  name="hours"
+                  onChange={formikPlanRoute.handleChange}
+                  value={formikPlanRoute.values.hours}
+                  // placeholder="Hours of Driving"
+                >
+                  <option value="option1">3 hours</option>
+                  <option value="option2">4 hours</option>
+                  <option value="option3">5 hours</option>
+                </Select>
+                <FormErrorMessage>{formikPlanRoute.errors.hours}</FormErrorMessage>
+              </FormLabel>
+            </FormControl>
+            <FormControl
+              isInvalid={
+                !!formikPlanRoute.errors.intermediateStop &&
+                formikPlanRoute.touched.intermediateStop
+              }
+            >
+              <FormLabel htmlFor="Intermediate Stops">
+                Intermediate Stops
+                <Select
+                  onChange={formikPlanRoute.handleChange}
+                  value={formikPlanRoute.values.intermediateStop}
+                  placeholder="Intermediate Stops"
+                >
+                  <option value="option1">
+                    Quebec Station, 3rd Street, Down Street
+                  </option>
+                  <option value="option2">Option 2</option>
+                  <option value="option3">Option 3</option>
+                </Select>
+                <FormErrorMessage>{formikPlanRoute.errors.intermediateStop}</FormErrorMessage>
+              </FormLabel>
+            </FormControl>
             <br />
             <p style={{ fontWeight: "bold" }}>Plot Stops on the Map</p>
             <Flex
@@ -307,7 +354,12 @@ export default function Map() {
             </Flex>
           </ModalBody>
           <Center>
-            <Button mt={4} colorScheme="blue" mr={3}>
+            <Button
+              onClick={formikPlanRoute.handleSubmit}
+              mt={4}
+              colorScheme="blue"
+              mr={3}
+            >
               Schedule Route
             </Button>
           </Center>
