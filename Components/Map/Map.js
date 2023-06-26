@@ -20,8 +20,17 @@ import {
   HStack,
   IconButton,
   Input,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  Select,
   SkeletonText,
   Text,
+  useDisclosure,
 } from "@chakra-ui/react";
 import ReactDatePicker from "react-datepicker";
 import { useFormik } from "formik";
@@ -54,7 +63,7 @@ export default function Map() {
     googleMapsApiKey: "AIzaSyCxF5mBRVIcJmmnpnvfzlejI2N79H7PZf4",
     libraries: libraries,
   });
-
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const [map, setMap] = useState(/** @type google.maps.Map */ (null));
   const [directionsResponse, setDirectionsResponse] = useState(null);
   const [distance, setDistance] = useState("");
@@ -243,11 +252,74 @@ export default function Map() {
           onClick={clearRoute}
         />
       </ButtonGroup>
+
+      {/* Plan route model */}
+
+      <Modal isOpen={isOpen} onClose={onClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Route Plan</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Select placeholder="Hours of Driving">
+              <option value="option1">3 hours</option>
+              <option value="option2">4 hours</option>
+              <option value="option3">5 hours</option>
+            </Select>
+            <br />
+            <Select placeholder="Intermediate Stops">
+              <option value="option1">
+                Quebec Station, 3rd Street, Down Street
+              </option>
+              <option value="option2">Option 2</option>
+              <option value="option3">Option 3</option>
+            </Select>
+            <br />
+            <p style={{ fontWeight: "bold" }}>Plot Stops on the Map</p>
+            <Flex
+              position="relative"
+              flexDirection="column"
+              alignItems="center"
+              h="40vh"
+              w="47vw"
+              // ml="-1.5vw"
+            >
+              <Box position="absolute" left={0} top={0} h="100%" w="100%">
+                {/* Google Map Box */}
+                <GoogleMap
+                  center={center}
+                  zoom={15}
+                  mapContainerStyle={{ width: "40%", height: "100%" }}
+                  options={{
+                    zoomControl: false,
+                    streetViewControl: false,
+                    mapTypeControl: false,
+                    fullscreenControl: false,
+                  }}
+                  onLoad={(map) => setMap(map)}
+                >
+                  <Marker position={center} />
+                  {directionsResponse && (
+                    <DirectionsRenderer directions={directionsResponse} />
+                  )}
+                </GoogleMap>
+              </Box>
+            </Flex>
+          </ModalBody>
+          <Center>
+            <Button mt={4} colorScheme="blue" mr={3}>
+              Schedule Route
+            </Button>
+          </Center>
+          <br />
+        </ModalContent>
+      </Modal>
+
       <Box mt={8}>
         <Center>
           <ButtonGroup ml={4}>
-            <Button colorScheme="blue" type="submit">
-              Plann Route
+            <Button onClick={onOpen} colorScheme="blue" type="submit">
+              Plan Route
             </Button>
             <Button colorScheme="blue" type="submit">
               Check Analytics
