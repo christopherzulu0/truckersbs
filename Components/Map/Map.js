@@ -12,17 +12,44 @@ import {
   Box,
   Button,
   ButtonGroup,
+  Center,
   Flex,
+  FormControl,
+  FormErrorMessage,
+  FormLabel,
   HStack,
   IconButton,
   Input,
   SkeletonText,
   Text,
 } from "@chakra-ui/react";
+import ReactDatePicker from "react-datepicker";
+import { useFormik } from "formik";
+// import { DatePicker, DatePickerInput } from "chakra-datetime-picker";
 
+import { mapSchema, mapValues } from "../validationSchema/map";
 const center = { lat: 48.8584, lng: 2.2945 };
 const libraries = ["places"];
+
 export default function Map() {
+  const formik = useFormik({
+    initialValues: mapValues,
+    validationSchema: mapSchema,
+    onSubmit: (values) => {
+      try {
+        // console.log("values", values.startTime);
+        alert(JSON.stringify(values, null, 2));
+      } catch (error) {
+        console.log("error", error);
+      }
+    },
+  });
+
+  const time = formik.values.startTime;
+  const end = Date.now();
+
+  console.log("time", end);
+
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: "AIzaSyCxF5mBRVIcJmmnpnvfzlejI2N79H7PZf4",
     libraries: libraries,
@@ -73,15 +100,15 @@ export default function Map() {
         flexDirection="column"
         alignItems="center"
         h="40vh"
-        w="64vw"
-        ml="-1.5vw"
+        w="47vw"
+        // ml="-1.5vw"
       >
         <Box position="absolute" left={0} top={0} h="100%" w="100%">
           {/* Google Map Box */}
           <GoogleMap
             center={center}
             zoom={15}
-            mapContainerStyle={{ width: "41%", height: "100%" }}
+            mapContainerStyle={{ width: "40%", height: "100%" }}
             options={{
               zoomControl: false,
               streetViewControl: false,
@@ -108,35 +135,88 @@ export default function Map() {
       >
         <HStack spacing={2} justifyContent="space-between">
           <Box flexGrow={1}>
-            <Autocomplete>
-              <Input type="text" placeholder="From" ref={originRef} />
-            </Autocomplete>
+            <FormControl
+              isInvalid={!!formik.errors.from && formik.touched.from}
+            >
+              <Autocomplete>
+                <FormLabel htmlFor="From">
+                  From
+                  <Input
+                    type="text"
+                    name="from"
+                    onChange={formik.handleChange}
+                    value={formik.values.from}
+                    placeholder="From"
+                  />
+                  <FormErrorMessage>{formik.errors.from}</FormErrorMessage>
+                </FormLabel>
+              </Autocomplete>
+            </FormControl>
           </Box>
           <Box flexGrow={1}>
-            <Autocomplete>
-              <Input
-                type="text"
-                placeholder="Start off time"
-                ref={destiantionRef}
-              />
-            </Autocomplete>
+            <FormControl
+              isInvalid={!!formik.errors.startTime && formik.touched.startTime}
+            >
+              <Autocomplete>
+                <FormLabel htmlFor="Start off time">
+                  Start off time
+                  <Input
+                    name="startTime"
+                    type="time"
+                    variant="filled"
+                    onChange={formik.handleChange}
+                    value={formik.values.startTime}
+                    placeholder="Start off time"
+                  />
+                  <FormErrorMessage>{formik.errors.startTime}</FormErrorMessage>
+                </FormLabel>
+              </Autocomplete>
+            </FormControl>
           </Box>
         </HStack>
         <br />
         <HStack spacing={2} justifyContent="space-between">
           <Box flexGrow={1}>
-            <Autocomplete>
-              <Input type="text" placeholder="Destination" ref={originRef} />
-            </Autocomplete>
+            <FormControl
+              isInvalid={
+                !!formik.errors.destination && formik.touched.destination
+              }
+            >
+              <Autocomplete>
+                <FormLabel htmlFor="Destination">
+                  Destination
+                  <Input
+                    name="destination"
+                    type="text"
+                    placeholder="Destination"
+                    onChange={formik.handleChange}
+                    value={formik.values.destination}
+                  />
+                  <FormErrorMessage>
+                    {formik.errors.destination}
+                  </FormErrorMessage>
+                </FormLabel>
+              </Autocomplete>
+            </FormControl>
           </Box>
           <Box flexGrow={1}>
-            <Autocomplete>
-              <Input
-                type="text"
-                placeholder="First stop"
-                ref={destiantionRef}
-              />
-            </Autocomplete>
+            <FormControl
+              isInvalid={!!formik.errors.firstStop && formik.touched.firstStop}
+            >
+              <Autocomplete>
+                <FormLabel htmlFor="First stop">
+                  First stop
+                  <Input
+                    name="firstStop"
+                    type="time"
+                    placeholder="First stop"
+                    onChange={formik.handleChange}
+                    value={formik.values.firstStop}
+                  />
+                  <FormErrorMessage>{formik.errors.firstStop}</FormErrorMessage>
+                </FormLabel>
+              </Autocomplete>
+            </FormControl>
           </Box>
         </HStack>
         <HStack spacing={4} mt={4} justifyContent="space-between">
@@ -154,7 +234,7 @@ export default function Map() {
         </HStack>
       </Box>
       <ButtonGroup ml={4}>
-        <Button colorScheme="blue" type="submit" onClick={calculateRoute}>
+        <Button onClick={formik.handleSubmit} colorScheme="blue" type="submit">
           Calculate Route
         </Button>
         <IconButton
@@ -163,6 +243,18 @@ export default function Map() {
           onClick={clearRoute}
         />
       </ButtonGroup>
+      <Box mt={8}>
+        <Center>
+          <ButtonGroup ml={4}>
+            <Button colorScheme="blue" type="submit">
+              Plann Route
+            </Button>
+            <Button colorScheme="blue" type="submit">
+              Check Analytics
+            </Button>
+          </ButtonGroup>
+        </Center>
+      </Box>
     </>
   );
 }
