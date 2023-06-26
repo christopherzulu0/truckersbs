@@ -31,7 +31,6 @@ export const ModalPopup= ({ children, isOpen, onClose }: ModalPopupProps) => {
             {children}
           </ModalBody>
           <ModalFooter>
-            <Button onClick={onClose as any}>Close</Button>
           </ModalFooter>
           </Box>
         </ModalContent>

@@ -16,6 +16,8 @@ import dynamic from "next/dynamic";
 import "react-quill/dist/quill.snow.css";
 import axios from "axios";
 import { IoIosClose } from "react-icons/io";
+import { app, firestore } from "@/firebase/clientApp";
+import { addDoc, collection, getFirestore } from "firebase/firestore";
 
 const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
 
@@ -33,18 +35,33 @@ const CreateArticleForm = forwardRef<HTMLDivElement, CreateArticleFormProps>(
     const [tags, setTags] = useState<string[]>([]);
     const quillRef = useRef<any>(null);
 
-    const handleCreateArticle = () => {
-      // Handle article creation logic here
-      console.log("Article created");
-      // Reset form fields
+    const handleCreateArticle = async () => {
+      try {
+        // Get the Firebase Firestore instance
+        const firestore = getFirestore();
+    
+        // Create a new article document in the "articles" collection
+        const articlesCollection = collection(firestore, "articles");
+        await addDoc(articlesCollection, {
+          title,
+          category,
+          description,
+        });
+    
+        console.log("Article created");
+        onClose();
+        setShowModal(true);
+      } catch (error) {
+        console.error("Error creating article:", error);
+        setShowModal(false);
+      }
+    
       setTitle("");
       setCategory("");
       setDescription("");
       setTags([]);
-      // Close the modal
-      onClose();
-      setShowModal(true);
     };
+    
 
     const handleTagChange = (event: { target: { value: string } }) => {
       const inputTags = event.target.value.split(",");
@@ -54,6 +71,16 @@ const CreateArticleForm = forwardRef<HTMLDivElement, CreateArticleFormProps>(
     const handleDescriptionChange = (value: string) => {
       setDescription(value);
     };
+
+    console.log("tags", tags);
+    console.log("description", description);
+    console.log("category", category);
+    console.log("title", title);
+    
+    
+    
+    
+    
 
     const uploadImage = async (file: File) => {
       try {

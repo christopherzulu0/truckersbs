@@ -5,16 +5,21 @@ import {
   FormControl,
   FormLabel,
   Input,
-  Radio,
-  RadioGroup,
+  Image,
   Stack,
 } from '@chakra-ui/react';
 
 const SubscriptionCard = () => {
+  const [cardHolderName, setCardHolderName] = useState('');
   const [cardNumber, setCardNumber] = useState('');
   const [expiryDate, setExpiryDate] = useState('');
   const [cvv, setCvv] = useState('');
   const [subscriptionType, setSubscriptionType] = useState('monthly');
+
+
+  const handleCardHolderNameChange = (event: { target: { value: React.SetStateAction<string>; }; }) => {
+    setCardHolderName(event.target.value);
+  };
 
   const handleCardNumberChange = (event: { target: { value: React.SetStateAction<string>; }; }) => {
     setCardNumber(event.target.value);
@@ -36,7 +41,7 @@ const SubscriptionCard = () => {
     // Handle subscription logic here
     // You can send the card information and subscription type to the server for processing
     console.log('Subscribed!');
-    console.log('Card Number:', cardNumber);
+    console.log('Card Number:', cardHolderName);
     console.log('Expiry Date:', expiryDate);
     console.log('CVV:', cvv);
     console.log('Subscription Type:', subscriptionType);
@@ -56,7 +61,7 @@ const SubscriptionCard = () => {
           flexDirection={'column'}
           background={'white'}
           p={'2'}
-          height={'100px'}
+          height={'80px'}
           >
           <FormLabel
           display={'flex'}
@@ -92,6 +97,29 @@ const SubscriptionCard = () => {
 
           </Box>
         </FormControl>
+        <Box 
+          display={'flex'}
+          justifyContent={'space-around'}
+          alignItems={'center'}
+          gap={'2'}
+          p={'1'}
+          border={'2px solid #8ed9f5'}
+        >
+        <Image src="/images/masterCard.png" alt="Facebook" boxSize={10} width={'full'} objectFit={'contain'} cursor={'pointer'} />
+        <Image src="/images/paypal.png" alt="Facebook" boxSize={10}  width={'full'} objectFit={'contain'} cursor={'pointer'}  />
+        <Image src="/images/visa.png" alt="Facebook" boxSize={10} width={'full'}  objectFit={'contain'} cursor={'pointer'} />
+        <Image src="/images/googlePay.png" alt="Facebook" boxSize={10} width={'full'} objectFit={'contain'} cursor={'pointer'}  />
+        </Box>
+        <FormControl id="cardHolderName">
+          <FormLabel color={'gray.400'} fontSize={'12px'}>Card Holder Name</FormLabel>
+          <Input
+            type="text"
+            background={'white'}
+            value={cardHolderName}
+            onChange={handleCardHolderNameChange}
+            border={'2px solid lightgray'}
+          />
+        </FormControl>
         <FormControl id="cardNumber">
           <FormLabel color={'gray.400'} fontSize={'12px'}>Card Number</FormLabel>
           <Input
@@ -99,9 +127,16 @@ const SubscriptionCard = () => {
             background={'white'}
             value={cardNumber}
             onChange={handleCardNumberChange}
+            border={'2px solid lightgray'}
           />
         </FormControl>
 
+        <Box
+        display={'flex'}
+        justifyContent={'space-between'}
+        alignItems={'center'}
+        gap={'2'}
+        >
         <FormControl id="expiryDate">
           <FormLabel color={'gray.400'} fontSize={'12px'}>Expiry Date</FormLabel>
           <Input
@@ -116,10 +151,17 @@ const SubscriptionCard = () => {
           <FormLabel color={'gray.400'} fontSize={'12px'}>CVV</FormLabel>
           <Input type="text" value={cvv} background={'white'} onChange={handleCvvChange} />
         </FormControl>
+        </Box>
 
-        <Button colorScheme="blue" onClick={handleSubscribe}>
-          Subscribe
+        <Box
+        display={'flex'}
+        justifyContent={'center'}
+        alignItems={'center'}
+        >
+        <Button colorScheme="blue" width="100px" p={'1'} onClick={handleSubscribe}>
+          Complete
         </Button>
+        </Box>
       </Stack>
     </Box>
   );
