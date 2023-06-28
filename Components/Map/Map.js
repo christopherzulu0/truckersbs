@@ -39,7 +39,6 @@ import { addDoc, collection, updateDoc, doc } from "firebase/firestore";
 import { firebase } from "../../firebase/clientApp";
 import { getFirestore } from "firebase/firestore";
 
-
 // import { DatePicker, DatePickerInput } from "chakra-datetime-picker";
 
 import { mapSchema, mapValues } from "../validationSchema/map";
@@ -52,8 +51,8 @@ const center = { lat: 48.8584, lng: 2.2945 };
 const libraries = ["places"];
 
 export default function Map() {
-
-const db = getFirestore(firebase)
+  const area = ["kabata", "chelstone", "ndola"];
+  const db = getFirestore(firebase);
 
   const formik = useFormik({
     initialValues: mapValues,
@@ -79,18 +78,17 @@ const db = getFirestore(firebase)
     validationSchema: planRouteSchema,
     onSubmit: async (values) => {
       try {
-        console.log("values", values);
+        const scheduleRoute = await addDoc(collection(db, "scheduledRoutes"), {
+          hours: values.hours,
+          intermediateStop: values.intermediateStop,
+        });
+        console.log(" scheduleRoute", scheduleRoute);
         alert(JSON.stringify(values, null, 2));
       } catch (error) {
         console.log("error", error);
       }
     },
   });
-
-  const time = formik.values.startTime;
-  const end = Date.now();
-
-  console.log("time", end);
 
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: "AIzaSyCxF5mBRVIcJmmnpnvfzlejI2N79H7PZf4",
@@ -325,15 +323,16 @@ const db = getFirestore(firebase)
               <FormLabel htmlFor="Intermediate Stops">
                 Intermediate Stops
                 <Select
+                  name="intermediateStop"
                   onChange={formikPlanRoute.handleChange}
                   value={formikPlanRoute.values.intermediateStop}
-                  placeholder="Intermediate Stops"
+                  // placeholder="Intermediate Stops"
                 >
-                  <option value="option1">
-                    Quebec Station, 3rd Street, Down Street
-                  </option>
-                  <option value="option2">Option 2</option>
-                  <option value="option3">Option 3</option>
+                  {area.map((m) => (
+                    <option value={m}>
+                      {m}
+                    </option>
+                  ))}
                 </Select>
                 <FormErrorMessage>
                   {formikPlanRoute.errors.intermediateStop}
