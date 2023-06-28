@@ -34,6 +34,12 @@ import {
 } from "@chakra-ui/react";
 import ReactDatePicker from "react-datepicker";
 import { useFormik } from "formik";
+// import { firebase } from "firebase/firestore";
+import { addDoc, collection, updateDoc, doc } from "firebase/firestore";
+import { firebase } from "../../firebase/clientApp";
+import { getFirestore } from "firebase/firestore";
+
+
 // import { DatePicker, DatePickerInput } from "chakra-datetime-picker";
 
 import { mapSchema, mapValues } from "../validationSchema/map";
@@ -46,12 +52,21 @@ const center = { lat: 48.8584, lng: 2.2945 };
 const libraries = ["places"];
 
 export default function Map() {
+
+const db = getFirestore(firebase)
+
   const formik = useFormik({
     initialValues: mapValues,
     validationSchema: mapSchema,
-    onSubmit: (values) => {
+    onSubmit: async (values) => {
       try {
-        // console.log("values", values.startTime);
+        const directions = await addDoc(collection(db, "directions"), {
+          from: values.from,
+          destination: values.destination,
+          startTime: values.startTime,
+          firstStop: values.firstStop,
+        });
+        console.log("values directions", directions);
         alert(JSON.stringify(values, null, 2));
       } catch (error) {
         console.log("error", error);
@@ -62,7 +77,7 @@ export default function Map() {
   const formikPlanRoute = useFormik({
     initialValues: planRouteValues,
     validationSchema: planRouteSchema,
-    onSubmit: (values) => {
+    onSubmit: async (values) => {
       try {
         console.log("values", values);
         alert(JSON.stringify(values, null, 2));
@@ -296,7 +311,9 @@ export default function Map() {
                   <option value="option2">4 hours</option>
                   <option value="option3">5 hours</option>
                 </Select>
-                <FormErrorMessage>{formikPlanRoute.errors.hours}</FormErrorMessage>
+                <FormErrorMessage>
+                  {formikPlanRoute.errors.hours}
+                </FormErrorMessage>
               </FormLabel>
             </FormControl>
             <FormControl
@@ -318,7 +335,9 @@ export default function Map() {
                   <option value="option2">Option 2</option>
                   <option value="option3">Option 3</option>
                 </Select>
-                <FormErrorMessage>{formikPlanRoute.errors.intermediateStop}</FormErrorMessage>
+                <FormErrorMessage>
+                  {formikPlanRoute.errors.intermediateStop}
+                </FormErrorMessage>
               </FormLabel>
             </FormControl>
             <br />
