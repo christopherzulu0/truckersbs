@@ -22,23 +22,30 @@ import {
 } from '@chakra-ui/react'
 import { useFormik } from 'formik';
 import { reportValues, reportSchema } from "../Components/validationSchema/report"
-
+import { firebase } from "../firebase/clientApp";
+import { getFirestore } from "firebase/firestore";
+import { addDoc, collection, updateDoc, doc } from "firebase/firestore";
+import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject } from 'firebase/storage'
 
 export default function Analytics() {
   const { isOpen, onOpen, onClose } = useDisclosure()
 
+  const db = getFirestore(firebase);
+  
   const formik = useFormik({
     initialValues: reportValues,
     validationSchema: reportSchema,
     onSubmit: async (values) => {
       try {
-        // const directions = await addDoc(collection(db, "directions"), {
-        //   from: values.from,
-        //   destination: values.destination,
-        //   startTime: values.startTime,
-        //   firstStop: values.firstStop,
-        // });
-        // console.log("values directions", directions);
+        const report = await addDoc(collection(db, "report"), {
+          type: values.type,
+          traffic: values.traffic,
+          route: values.route,
+          condition: values.condition,
+          attachment: values.attachment,
+          description: values.description,
+        });
+        console.log("values report", report);
         alert(JSON.stringify(values, null, 2));
       } catch (error) {
         console.log("error", error);
