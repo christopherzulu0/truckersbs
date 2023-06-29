@@ -3,18 +3,25 @@ import { useRouter } from "next/router";
 import Footer from "@/Components/Footer";
 import {
   Box,
+  Button,
   Container,
   Divider,
   Flex,
   Image,
   Link,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
   Text,
 } from "@chakra-ui/react";
 import DonateComponent, {
   ModalPopup,
 } from "@/Components/Article/ArticleForm/DonatePopUp";
 import SubscriptionCard from "@/Components/subscription/Subscription";
-import PostLoader from "../../Components/Post/Loader"
+import PostLoader from "../../Components/Post/Loader";
+import { BsThreeDots } from "react-icons/bs";
+import EditArticleForm from "@/Components/Article/ArticleForm/EditArticle";
 
 const SocialMediaLinks = () => {
   return (
@@ -104,6 +111,7 @@ function ArticleDetailsPage() {
   const [article, setArticle] = useState<Article>();
   const [showSubscription, setShowSubscription] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -126,9 +134,11 @@ function ArticleDetailsPage() {
     }
   }, [id]);
 
-  if(loading) {
+  if (loading) {
     return (
-  <PostLoader />
+      <Container>
+        <PostLoader />
+      </Container>
     );
   }
 
@@ -136,8 +146,44 @@ function ArticleDetailsPage() {
     return <Text>Article not found.</Text>;
   }
 
-    const onClose = () => {
+  const onClose = () => {
     setShowSubscription(false);
+  };
+
+  // Handle edit functionality
+  const handleEdit = () => {
+    setIsOpen(true);
+  };
+
+// Handle delete functionality
+const handleDelete = async () => {
+  try {
+    // Make an API call to delete the article
+    const response = await fetch(`/api/articles/${id}`, {
+      method: 'DELETE',
+    });
+
+    if (response.ok) {
+      console.log('Article deleted successfully');
+      // Redirect or perform any additional actions after deleting the article
+    } else {
+      console.error('Failed to delete the article');
+    }
+  } catch (error) {
+    console.error('Error deleting the article:', error);
+  }
+};
+
+
+  const handleOnClose = ()=> {
+    setIsOpen(false);
+  }
+
+  const initialValues = {
+    title: article.title,
+    category: article.category,
+    description: article.description,
+    imageURL: article.imageURL
   }
 
   return (
@@ -193,7 +239,22 @@ function ArticleDetailsPage() {
               mb={4}
               maxW={{ base: "100%", sm: "100%", md: "100%", lg: "100%" }}
             />
-            <Box>
+            <Box
+              display={"flex"}
+              justifyContent={"center"}
+              alignItems={"flex-start"}
+              flexDirection={"column"}
+              gap={"4"}
+            >
+              <Menu>
+                <MenuButton as={Button} variant="ghost" size="sm">
+                  <BsThreeDots size={20} />
+                </MenuButton>
+                <MenuList>
+                  <MenuItem onClick={handleEdit}>Edit</MenuItem>
+                  <MenuItem onClick={handleDelete}>Delete</MenuItem>
+                </MenuList>
+              </Menu>
               <SocialMediaLinks />
             </Box>
           </Box>
@@ -210,6 +271,7 @@ function ArticleDetailsPage() {
         </ModalPopup>
       )}
       <DonateComponent setShowSubscription={setShowSubscription} />
+      < EditArticleForm isOpen={isOpen} onClose={handleOnClose} articleId={id as any} initialValues={initialValues}/>
       <Footer />
     </>
   );

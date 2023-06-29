@@ -98,7 +98,10 @@ export default function Articles() {
 
   if(loading) {
     return (
-  <PostLoader />
+      <Container
+      >
+        <PostLoader />
+      </Container>
     );
   }
 
