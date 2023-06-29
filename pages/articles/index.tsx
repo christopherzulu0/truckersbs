@@ -1,4 +1,4 @@
-import React,{ReactElement} from 'react'
+import React,{ReactElement, useEffect, useState} from 'react'
 import {
     Box,
     Center,
@@ -20,6 +20,10 @@ import { FaArrowCircleRight } from "react-icons/fa";
 
 import Footer from "../../Components/Footer"
 import CreateArticleForm from '@/Components/Article/ArticleForm/ArticleForm';
+import { app, firestore } from '@/firebase/clientApp';
+import Link from 'next/link';
+
+
 
 interface CardProps {
   heading: string;
@@ -39,26 +43,31 @@ const Cards = ({heading, description, image,href }: CardProps) => {
       borderRadius="lg"
       overflow="hidden"
       p={5}>
-      <Stack align={'start'} spacing={2}>
+      <Stack align={'center'} spacing={2}>
         <Flex
           align={'center'}
           justify={'center'}
-          objectFit="contain"
-         
+          objectFit="cover"
+          width={'100%'}
+          height={'250px'}
+          minHeight={'250px'}
+          maxHeight={'250px'}
           >
           {image}
         </Flex>
-        <Box >
-          <Heading size="md" style={{marginTop:"-35px"}}>{heading}</Heading>
-          <Text  fontSize={'sm'}>
+        <Box width={'inherit'} display={'flex'} justifyContent={'center'} alignItems={'center'} flexFlow={'column'}>
+          <Heading size="md" style={{marginTop:"20px"}} alignContent={'center'}>{heading}</Heading>
+          <Text  fontSize={'sm'} textAlign={'center'} overflow="hidden" textOverflow="ellipsis" whiteSpace="nowrap" width="200px">
             {description}
           </Text>
           <br/>
           
         </Box>
-        <Button variant={'link'} colorScheme={'blue'} size={'sm'}>
-          View More<FaArrowCircleRight style={{marginLeft:"5px"}}/>
-        </Button>
+        <Link href={href}>
+          <Button variant={'link'} colorScheme={'blue'} size={'sm'} display={'flex'} justifyContent={'center'} alignItems={'center'} width={'inherit'}>
+            View More<FaArrowCircleRight style={{ marginLeft: '5px' }} />
+          </Button>
+        </Link>
       </Stack>
     </Box>
   );
@@ -68,6 +77,18 @@ const Cards = ({heading, description, image,href }: CardProps) => {
 
 export default function Articles() {
   const [isOpen, setIsOpen] = React.useState(false);
+  const [articles, setArticles] = useState([]);
+
+  useEffect(() => {
+    fetch("/api/articles")
+      .then((response) => response.json())
+      .then((data) => setArticles(data.articles)
+      )
+      .catch((error) => console.error("Error fetching articles:", error));
+  }, [])
+
+  
+console.log('articles', articles);
 
 
 
@@ -139,16 +160,17 @@ export default function Articles() {
  
         <Flex flexWrap="wrap" gridGap={6} justify="center">
               
-          <Cards
-           
-            heading={'Sun Fransico Scorcing  Sun'}
-            image={<Image src="https://th.bing.com/th/id/R.bbfd7a4454e000bfc9e814c907bcdf79?rik=XWlwHD%2bcnyU%2bJg&pid=ImgRaw&r=0" alt={'Image description'} width={300} height={250} objectFit="contain"/>}
-            description={
-              'Scorcing  Sun in fransico'
-            }
-            href={'#'}
-          />
-          <Cards
+        {articles?.map((article: any) => (
+  <Cards
+    key={article.id}
+    heading={article.title}
+    image={<Image src={article.imageURL} alt={article.title} width={'100%'} height={250} objectFit={'contain'} />}
+    description={article.description}
+    href={`/articles/${article.id}`}
+  />
+))}
+
+          {/* <Cards
             heading={'Home deco startup opens'}
             image={<Image src="https://th.bing.com/th/id/OIP.s-QXJYVYyZPl9J8fM8iqQwHaD8?w=312&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7" alt={'Image description'} width={300} height={250} objectFit="contain" />}
             description={
@@ -164,7 +186,7 @@ export default function Articles() {
               'Why it gets colder on the north pole...'
             }
             href={'#'}
-          />
+          /> */}
    
     
         </Flex>
