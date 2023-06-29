@@ -22,6 +22,7 @@ import Footer from "../../Components/Footer"
 import CreateArticleForm from '@/Components/Article/ArticleForm/ArticleForm';
 import { app, firestore } from '@/firebase/clientApp';
 import Link from 'next/link';
+import PostLoader from '@/Components/Post/Loader';
 
 
 
@@ -56,7 +57,7 @@ const Cards = ({heading, description, image,href }: CardProps) => {
           {image}
         </Flex>
         <Box width={'inherit'} display={'flex'} justifyContent={'center'} alignItems={'center'} flexFlow={'column'}>
-          <Heading size="md" style={{marginTop:"20px"}} alignContent={'center'}>{heading}</Heading>
+          <Heading size="md" overflow="hidden" textOverflow="ellipsis" whiteSpace="nowrap" width="200px" style={{marginTop:"20px"}} textAlign={'center'}>{heading}</Heading>
           <Text  fontSize={'sm'} textAlign={'center'} overflow="hidden" textOverflow="ellipsis" whiteSpace="nowrap" width="200px">
             {description}
           </Text>
@@ -78,17 +79,31 @@ const Cards = ({heading, description, image,href }: CardProps) => {
 export default function Articles() {
   const [isOpen, setIsOpen] = React.useState(false);
   const [articles, setArticles] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    setLoading(true);
+  
     fetch("/api/articles")
       .then((response) => response.json())
-      .then((data) => setArticles(data.articles)
-      )
-      .catch((error) => console.error("Error fetching articles:", error));
-  }, [])
+      .then((data) => {
+        setArticles(data.articles);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error("Error fetching articles:", error);
+        setLoading(false);
+      });
+  }, []);
+
+  if(loading) {
+    return (
+  <PostLoader />
+    );
+  }
 
   
-console.log('articles', articles);
+// console.log('articles', articles);
 
 
 
@@ -158,7 +173,7 @@ console.log('articles', articles);
         Latest Articles
         </Heading>
  
-        <Flex flexWrap="wrap" gridGap={6} justify="center">
+  <Flex flexWrap="wrap" gridGap={6} justifyContent={'flex-start'} alignItems={'center'} mb={'2'}>
               
         {articles?.map((article: any) => (
   <Cards
@@ -169,63 +184,8 @@ console.log('articles', articles);
     href={`/articles/${article.id}`}
   />
 ))}
-
-          {/* <Cards
-            heading={'Home deco startup opens'}
-            image={<Image src="https://th.bing.com/th/id/OIP.s-QXJYVYyZPl9J8fM8iqQwHaD8?w=312&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7" alt={'Image description'} width={300} height={250} objectFit="contain" />}
-            description={
-              'Capi Deco Start up opens'
-            }
-            href={'#'}
-          />
-           <Cards
-           
-            heading={'Why is it colder on the North Pole'}
-            image={<Image src="https://th.bing.com/th/id/R.b270779631af86f839fb23ae6c1beae7?rik=VrsuBI%2fvJi0ilg&pid=ImgRaw&r=0" alt={'Image description'} width={300} height={250} objectFit="contain"/>}
-            description={
-              'Why it gets colder on the north pole...'
-            }
-            href={'#'}
-          /> */}
-   
-    
         </Flex>
       </Container>
-
-      <Container maxW={'5xl'} mt={12} mb={7}>
- 
-        <Flex flexWrap="wrap" gridGap={6} justify="center">
-              
-          <Cards
-           
-           heading={'Sun Fransico Scorcing  Sun'}
-           image={<Image src="https://th.bing.com/th/id/R.bbfd7a4454e000bfc9e814c907bcdf79?rik=XWlwHD%2bcnyU%2bJg&pid=ImgRaw&r=0" alt={'Image description'} width={300} height={250} objectFit="contain"/>}
-           description={
-             'Scorcing  Sun in fransico'
-           }
-           href={'#'}
-         />
-         <Cards
-           heading={'Home deco startup opens'}
-           image={<Image src="https://th.bing.com/th/id/OIP.s-QXJYVYyZPl9J8fM8iqQwHaD8?w=312&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7" alt={'Image description'} width={300} height={250} objectFit="contain" />}
-           description={
-             'Capi Deco Start up opens'
-           }
-           href={'#'}
-         />
-          <Cards
-          
-           heading={'Why is it colder on the North Pole'}
-           image={<Image src="https://th.bing.com/th/id/R.b270779631af86f839fb23ae6c1beae7?rik=VrsuBI%2fvJi0ilg&pid=ImgRaw&r=0" alt={'Image description'} width={300} height={250} objectFit="contain"/>}
-           description={
-             'Why it gets colder on the north pole...'
-           }
-            href={'#'}
-          />
-    
-        </Flex>
-      </Container>
-
       <Footer />
     </>
   )

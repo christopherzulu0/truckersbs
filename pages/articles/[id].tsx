@@ -14,6 +14,7 @@ import DonateComponent, {
   ModalPopup,
 } from "@/Components/Article/ArticleForm/DonatePopUp";
 import SubscriptionCard from "@/Components/subscription/Subscription";
+import PostLoader from "../../Components/Post/Loader"
 
 const SocialMediaLinks = () => {
   return (
@@ -102,9 +103,11 @@ function ArticleDetailsPage() {
   const { id } = router.query;
   const [article, setArticle] = useState<Article>();
   const [showSubscription, setShowSubscription] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (id) {
+      setLoading(true);
       fetch(`/api/articles/${id}`)
         .then((response) => response.json())
         .then((data) => {
@@ -116,9 +119,18 @@ function ArticleDetailsPage() {
         })
         .catch((error) => {
           console.error("Error fetching article:", error);
+        })
+        .finally(() => {
+          setLoading(false);
         });
     }
   }, [id]);
+
+  if(loading) {
+    return (
+  <PostLoader />
+    );
+  }
 
   if (!article) {
     return <Text>Article not found.</Text>;
