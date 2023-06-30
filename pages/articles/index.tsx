@@ -48,7 +48,7 @@ const Cards = ({heading, description, image,href }: CardProps) => {
         <Flex
           align={'center'}
           justify={'center'}
-          objectFit="cover"
+          // objectFit="contain"
           width={'100%'}
           height={'250px'}
           minHeight={'250px'}
@@ -182,7 +182,7 @@ export default function Articles() {
   <Cards
     key={article.id}
     heading={article.title}
-    image={<Image src={article.imageURL} alt={article.title} width={'100%'} height={250} objectFit={'contain'} />}
+    image={<Image src={article.imageURL} alt={article.title} width={'100%'}  minHeight={250} maxHeight={250} objectFit={'cover'}/>}
     description={article.description}
     href={`/articles/${article.id}`}
   />
