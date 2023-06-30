@@ -37,8 +37,9 @@ export default function FormTriggerBtn({ getReports }) {
   const [description, setDescription] = useState("");
   const [image, setImage] = useState(null);
   const [caption, setCaption] = useState(null);
-  const [driverName, setDriverName] = useState(null);
-  const [plateNumber, setPlateNumber] = useState(null);
+  const [driverName, setDriverName] = useState("");
+  const [plateNumber, setPlateNumber] = useState("");
+  const [driverDescription, setDriverDescription] = useState("");
 
   const handleInputChange = (e) => {
     const file = e.target.files[0];
@@ -107,6 +108,11 @@ export default function FormTriggerBtn({ getReports }) {
 
     console.log("Description:", description);
     console.log("Image:", image);
+    console.log("driver descrption", driverDescription);
+
+    console.log("Driver Name:", driverName);
+
+    console.log("Plate number:", plateNumber);
 
     try {
       // Upload image to Firebase Storage
@@ -117,7 +123,7 @@ export default function FormTriggerBtn({ getReports }) {
 
       // Create document in Firestore
       const db = getFirestore();
-      const docRef = await addDoc(collection(db, "report"), {
+      const docRef = await addDoc(collection(db, "report_drivers"), {
         attachment: downloadUrl,
         caption,
         companyName,
@@ -125,11 +131,13 @@ export default function FormTriggerBtn({ getReports }) {
         timeNow: time.timeNow,
         dateTime: time.dateTime,
         date: time.date,
+        describeDriver: driverDescription,
+        driverName,
+        plateNumber,
         description,
       });
 
       console.log("Document created with ID:", docRef.id);
-      getReports(3);
     } catch (error) {
       console.error("Error creating document:", error);
     } finally {
@@ -143,7 +151,6 @@ export default function FormTriggerBtn({ getReports }) {
 
     onClose();
   };
-
 
   return (
     <>
@@ -209,12 +216,27 @@ export default function FormTriggerBtn({ getReports }) {
 
               <FormControl mb={4}>
                 <FormLabel>Driver Name</FormLabel>
-                <Input value={driverName} />
+                <Input
+                  value={driverName}
+                  onChange={(e) => setDriverName(e.target.value)}
+                />
+              </FormControl>
+
+              <FormControl mb={4}>
+                <FormLabel>Driver Description</FormLabel>
+                <Input
+                  //   value={driverDescription}
+                  value={driverDescription}
+                  onChange={(e) => setDriverDescription(e.target.value)}
+                />
               </FormControl>
 
               <FormControl mb={4}>
                 <FormLabel>License Plate Number </FormLabel>
-                <Input value={plateNumber} />
+                <Input
+                  value={plateNumber}
+                  onChange={(e) => setPlateNumber(e.target.value)}
+                />
               </FormControl>
               <FormControl mb={4}>
                 <FormLabel>Incident Description</FormLabel>
