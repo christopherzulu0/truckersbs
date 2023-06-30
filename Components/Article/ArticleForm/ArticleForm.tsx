@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Button, FormControl, FormErrorMessage, FormLabel, Input, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@chakra-ui/react";
+import { Button, FormControl, FormErrorMessage, FormLabel, Input, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, Select } from "@chakra-ui/react";
 import dynamic from "next/dynamic";
 import "react-quill/dist/quill.snow.css";
 import { IoIosClose } from "react-icons/io";
@@ -26,12 +26,16 @@ const CreateArticleForm: React.FC<CreateArticleFormProps> = ({ isOpen, onClose }
       category: "",
       description: "",
       imageUrl: "",
+      tags: [],
+      reads: 0,
     },
     validationSchema: Yup.object({
       title: Yup.string().required("Title is required"),
       category: Yup.string().required("Category is required"),
       description: Yup.string().required("Description is required"),
       imageUrl: Yup.string().required("Image URL is required"),
+      tags: Yup.array().of(Yup.string()),
+      reads: Yup.string()
     }),
     onSubmit: (values: any) => {
       handleCreateArticle();
@@ -50,17 +54,24 @@ const CreateArticleForm: React.FC<CreateArticleFormProps> = ({ isOpen, onClose }
           formik.values.description,
           "text/html"
         );
-        const cleanDescription = doc.querySelector("p")?.textContent;
+    // Clean the description from the Quill editor
+    let cleanDescription = '';
+    if (formik.values.description) {
+      const parser = new DOMParser();
+      const docx = parser.parseFromString(formik.values.description, 'text/html');
+      const paragraphs = Array.from(docx.querySelectorAll('p'));
+      cleanDescription = paragraphs.map((p) => p.textContent).join('\n\n');
+    }
 
-        // Create a new article document in the "articles" collection
-        const articleDocRef = await addDoc(collection(firestore, "articles"), {
-          title: formik.values.title,
-          category: formik.values.category,
-          description: cleanDescription,
-          createdAt: serverTimestamp(),
-          editedAt: serverTimestamp(),
-        });
-
+    // Create a new article document in the "articles" collection
+    const articleDocRef = await addDoc(collection(firestore, 'articles'), {
+      title: formik.values.title,
+      category: formik.values.category,
+      description: cleanDescription,
+      reads: formik.values.reads,
+      createdAt: serverTimestamp(),
+      editedAt: serverTimestamp(),
+    });
         console.log("HERE IS NEW POST ID", articleDocRef.id);
 
         const imageRef = ref(storage, `posts/${articleDocRef.id}/image`);
@@ -92,11 +103,6 @@ const CreateArticleForm: React.FC<CreateArticleFormProps> = ({ isOpen, onClose }
     formik.setFieldValue("description", value);
   };
 
-  console.log("tags", tags);
-  console.log("description", formik.values.description);
-  console.log("category", formik.values.category);
-  console.log("title", formik.values.title);
-  console.log("imageUrl", formik.values.imageUrl);
 
   // Extract the image URL from the description
   const extractImageURL = () => {
@@ -148,13 +154,21 @@ const CreateArticleForm: React.FC<CreateArticleFormProps> = ({ isOpen, onClose }
               <FormErrorMessage>{formik.errors.title}</FormErrorMessage>
             </FormControl>
             <FormControl mb={4} isInvalid={formik.touched.category && formik.errors.category as any}>
-              <FormLabel>Category</FormLabel>
-              <Input
-                placeholder="Enter article category"
-                {...formik.getFieldProps("category")}
-              />
-              <FormErrorMessage>{formik.errors.category}</FormErrorMessage>
-            </FormControl>
+  <FormLabel>Category</FormLabel>
+  <Select
+    placeholder="Select article category"
+    {...formik.getFieldProps("category")}
+  >
+    <option value="weather">Weather</option>
+    <option value="accidents">Accidents</option>
+    <option value="general">General</option>
+    <option value="technology">Technology</option>
+    <option value="health">Health</option>
+    <option value="business">Business</option>
+  </Select>
+  <FormErrorMessage>{formik.errors.category}</FormErrorMessage>
+</FormControl>
+
             <FormControl mb={4} isInvalid={formik.touched.description && formik.errors.description as any}>
               <FormLabel>Description</FormLabel>
               <ReactQuill

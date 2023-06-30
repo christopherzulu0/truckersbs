@@ -103,12 +103,15 @@ interface Article {
   imageURL: string;
   description: string;
   category: string;
+  reads: number;
+  tags: []
 }
 
 function ArticleDetailsPage() {
   const router = useRouter();
   const { id } = router.query;
   const [article, setArticle] = useState<Article>();
+  const [reads, setReads ] = useState(0);
   const [showSubscription, setShowSubscription] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
@@ -133,6 +136,28 @@ function ArticleDetailsPage() {
         });
     }
   }, [id]);
+  
+  // Increment the reads count when the article is loaded
+  useEffect(() => {
+    if (article) {
+      // Update the reads count in the database
+      fetch(`/api/articles/${id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({}),
+      })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Failed to update the reads count");
+          }
+        })
+        .catch((error) => {
+          console.error("Error updating the reads count:", error);
+        });
+    }
+  }, [article, id]);  
 
   if (loading) {
     return (
@@ -235,7 +260,7 @@ const handleDelete = async () => {
               alt={article.title}
               boxSize={700}
               maxH="400px"
-              objectFit={"cover"}
+              objectFit={"contain"}
               mb={4}
               maxW={{ base: "100%", sm: "100%", md: "100%", lg: "100%" }}
             />
