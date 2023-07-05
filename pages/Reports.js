@@ -27,6 +27,7 @@ import {
   ModalBody,
   ModalFooter,
   useDisclosure,
+  Spinner,
 } from "@chakra-ui/react";
 
 // custom components
@@ -166,24 +167,41 @@ const Card = ({ heading, time, description, location, imageSrc, href }) => {
   );
 };
 
+// create a loading indicator
+
+const LoadingWidget = () => {
+  return (
+    <Box
+      height="100vh"
+      display="flex"
+      justifyContent="center"
+      alignItems="center"
+    >
+      <Spinner size="xl" />
+    </Box>
+  );
+};
+
+// main component
 export default function Report() {
   const [reports, setReports] = useState([]);
   const [downloadURL, setDownloadURL] = useState("");
-
-  // console.log(reports[0].time.timeNow);
+  const [isLoading, setIsLoading] = useState(false);
 
   const getAllreports = async (limit) => {
     try {
+      setIsLoading(!isLoading);
+      console.log(reports.length);
       const db = getFirestore();
       const querySnapshot = await getDocs(collection(db, "report"));
 
-      const reports = [];
+      const allReports = [];
       querySnapshot.forEach((doc) => {
-        reports.push({ id: doc.id, ...doc.data() });
+        allReports.push({ id: doc.id, ...doc.data() });
       });
 
-      setReports(reports);
-      console.log("All reports:", reports);
+      setReports(allReports);
+      console.log("All reports:", allReports, "isLoading:", isLoading);
     } catch (error) {
       console.error("Error retrieving reports:", error);
     }
@@ -193,8 +211,12 @@ export default function Report() {
   }, []);
 
   useEffect(() => {
-    console.log("All reports:", reports);
-  });
+    console.log("All reports:", reports.length);
+    if (reports.length > 0) {
+      setIsLoading(!isLoading);
+      console.log(reports.length, isLoading);
+    }
+  }, [reports]);
 
   return (
     <>
@@ -229,9 +251,9 @@ export default function Report() {
           </VStack>
         </Box>
       </Flex>{" "}
+      {isLoading && <LoadingWidget />}
       <Wrap mx={{ base: "auto", md: "80px" }} p={{ base: "0", md: "32px" }}>
         {reports.map((report, idx) => {
-          console.log(report);
           return (
             <WrapItem key={idx}>
               <Card
