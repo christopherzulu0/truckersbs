@@ -18,7 +18,9 @@ import {
   FormErrorMessage,
   HStack,
   Select,
-  Textarea
+  Textarea,
+  SimpleGrid,
+  Container
 } from '@chakra-ui/react'
 import { useFormik } from 'formik';
 import { reportValues, reportSchema } from "../Components/validationSchema/report"
@@ -26,12 +28,14 @@ import { firebase } from "../firebase/clientApp";
 import { getFirestore } from "firebase/firestore";
 import { addDoc, collection, updateDoc, doc } from "firebase/firestore";
 import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject } from 'firebase/storage'
+import AccidentReportTable from "../pages/AccidentReportTable"
+
 
 export default function Analytics() {
   const { isOpen, onOpen, onClose } = useDisclosure()
 
   const db = getFirestore(firebase);
-  
+
   const formik = useFormik({
     initialValues: reportValues,
     validationSchema: reportSchema,
@@ -83,9 +87,9 @@ export default function Analytics() {
                     onChange={formik.handleChange}
                     value={formik.values.type}
                   >
-                    <option value="option1">Road</option>
-                    <option value="option2">Accident</option>
-                    <option value="option3">Rainly</option>
+                    <option value="Road">Road</option>
+                    <option value="Accident">Accident</option>
+                    <option value="Rainly">Rainly</option>
                   </Select>
                   <FormErrorMessage>
                     {formik.errors.type}
@@ -106,12 +110,12 @@ export default function Analytics() {
                     onChange={formik.handleChange}
                     value={formik.values.traffic}
                   >
-                    <option value="option1">10%</option>
-                    <option value="option1">20%</option>
-                    <option value="option1">40%</option>
-                    <option value="option2">60%</option>
-                    <option value="option3">80%</option>
-                    <option value="option3">100%</option>
+                    <option value="10%">10%</option>
+                    <option value="20%">20%</option>
+                    <option value="40%">40%</option>
+                    <option value="60%">60%</option>
+                    <option value="80%">80%</option>
+                    <option value="100%">100%</option>
                   </Select>
                   <FormErrorMessage>
                     {formik.errors.traffic}
@@ -135,10 +139,10 @@ export default function Analytics() {
                     onChange={formik.handleChange}
                     value={formik.values.route}
                   >
-                    <option value="option1">Montreal - Quebec</option>
-                    <option value="option2">Montreal - Ontario</option>
-                    <option value="option3">Quebec - Toronto</option>
-                    <option value="option3">Montreal - Quebec</option>
+                    <option value="Montreal - Quebec">Montreal - Quebec</option>
+                    <option value="Montreal - Ontario">Montreal - Ontario</option>
+                    <option value="Quebec - Toronto">Quebec - Toronto</option>
+                    <option value="Montreal - Quebec">Montreal - Quebec</option>
                   </Select>
                   <FormErrorMessage>
                     {formik.errors.route}
@@ -159,9 +163,9 @@ export default function Analytics() {
                     onChange={formik.handleChange}
                     value={formik.values.condition}
                   >
-                    <option value="option1">Good</option>
-                    <option value="option2">Bad</option>
-                    <option value="option3">Better</option>
+                    <option value="Good">Good</option>
+                    <option value="Bad">Bad</option>
+                    <option value="Better">Better</option>
                   </Select>
                   <FormErrorMessage>
                     {formik.errors.condition}
@@ -219,6 +223,25 @@ export default function Analytics() {
           </ModalFooter>
         </ModalContent>
       </Modal>
+
+
+
+
+
+      <SimpleGrid columns={2} spacing={10}>
+        <Box bg='tomato' height='80px'>
+
+        </Box>
+        <Box bg='' height='80px'>
+          <center>
+            <Button colorScheme='red' size='lg'>
+              Accidents
+            </Button>
+          </center>
+          <AccidentReportTable db={db} />
+        </Box>
+        <Box bg='tomato' height='80px'></Box>
+      </SimpleGrid>
     </>
   )
 }
