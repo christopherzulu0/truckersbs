@@ -3,7 +3,7 @@ import { FaArrowCircleRight } from "react-icons/fa";
 import { AiOutlineArrowRight } from "react-icons/ai";
 import { GrDocumentUpload } from "react-icons/gr";
 import { getFirestore, collection, getDocs } from "firebase/firestore";
-
+// import PostLoader from "../Components/Post/Loader.tsx";
 import {
   Flex,
   Spacer,
@@ -32,7 +32,7 @@ import {
 // custom components
 
 import FormTriggerBtn from "../Components/Modal/FormModal/RoadReports.jsx";
-import DriverTriggerReport from "../Components/Modal/FormModal/ReportDriver.js"
+import DriverTriggerReport from "../Components/Modal/FormModal/ReportDriver.js";
 import ModalWrapper from "../Components/Modal/ModalWrapper.tsx";
 
 import Footer from "../Components/Footer";
@@ -116,16 +116,12 @@ function CardModal({ imageSrc, heading, description, time, location }) {
 
 const Card = ({ heading, time, description, location, imageSrc, href }) => {
   return (
-    // <>
     <Box
-      // maxW={{ base: "full", md: "275px" }}
-      w={"lg"}
+      w={{ md: "lg" }}
       borderWidth="1px"
       borderRadius="10px"
       overflow="hidden"
-      // pt={"64px"}
-      m="32px"
-      // mx="auto"
+      m={{ base: "4", md: "auto" }}
     >
       <Stack align="start" spacing="2">
         <Flex align={"center"} justify={"center"} objectFit="contain">
@@ -193,8 +189,12 @@ export default function Report() {
     }
   };
   useEffect(() => {
-    getAllreports(3);
+    getAllreports();
   }, []);
+
+  useEffect(() => {
+    console.log("All reports:", reports);
+  });
 
   return (
     <>
@@ -208,38 +208,44 @@ export default function Report() {
           bgSize="cover"
         >
           <VStack>
-            <Heading fontSize="64px" font="Poppins">
+            <Heading fontSize={{ base: "34", md: "64" }} font="Poppins">
               View Road Reports
             </Heading>
-            <Text fontSize="36px">
+            <Text fontSize={{ base: "18", md: "lg" }}>
               Make a report or report reckless drivers
             </Text>
 
-            <HStack fontSize="16px">
+            <HStack fontSize={{ base: "12", md: "16" }}>
               <FormTriggerBtn getReports={getAllreports}>
                 Make a Report
               </FormTriggerBtn>{" "}
-              <DriverTriggerReport h="55px" bg="#6484FB">
+              <DriverTriggerReport
+                h={{ base: "40px", md: "55px" }}
+                bg="#6484FB"
+              >
                 Report Driver
               </DriverTriggerReport>
             </HStack>
           </VStack>
         </Box>
       </Flex>{" "}
-      <Wrap mx="80px" p="32px">
-        {reports.map((report) => (
-          <WrapItem>
-            <Card
-              heading={report.caption}
-              imageSrc={report.attachment}
-              date={report.date}
-              time={report.timeNow}
-              location={report.location}
-              href={"#"}
-              description={report.description}
-            />
-          </WrapItem>
-        ))}
+      <Wrap mx={{ base: "auto", md: "80px" }} p={{ base: "0", md: "32px" }}>
+        {reports.map((report, idx) => {
+          console.log(report);
+          return (
+            <WrapItem key={idx}>
+              <Card
+                heading={report.caption}
+                imageSrc={report.attachment}
+                date={report.date}
+                time={report.timeNow}
+                location={report.location}
+                href={"#"}
+                description={report.description}
+              />
+            </WrapItem>
+          );
+        })}
       </Wrap>
       <Footer />
     </>
