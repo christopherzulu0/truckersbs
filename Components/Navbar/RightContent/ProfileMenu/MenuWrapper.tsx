@@ -30,6 +30,8 @@ type MenuWrapperProps = {};
 const MenuWrapper: React.FC<MenuWrapperProps> = () => {
   const [authModal, setModalState] = useRecoilState(authModalState);
   const [user] = useAuthState(auth);
+
+
   return (
     <Menu>
       <MenuButton

@@ -19,6 +19,7 @@ interface CreateArticleFormProps {
 const CreateArticleForm: React.FC<CreateArticleFormProps> = ({ isOpen, onClose }: CreateArticleFormProps) => {
   const [showModal, setShowModal] = useState(false);
   const [tags, setTags] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const formik = useFormik({
     initialValues: {
@@ -44,6 +45,7 @@ const CreateArticleForm: React.FC<CreateArticleFormProps> = ({ isOpen, onClose }
 
   const handleCreateArticle = async () => {
     if (formik.isValid) {
+      setIsLoading(true); // Set loading state to true
       try {
         // Get the Firebase Firestore instance
         const firestore = getFirestore();
@@ -65,9 +67,9 @@ const CreateArticleForm: React.FC<CreateArticleFormProps> = ({ isOpen, onClose }
 
     // Create a new article document in the "articles" collection
     const articleDocRef = await addDoc(collection(firestore, 'articles'), {
-      title: formik.values.title,
-      category: formik.values.category,
-      description: cleanDescription,
+      title: formik.values.title.toLowerCase(),
+      category: formik.values.category.toLowerCase(),
+      description: cleanDescription.toLowerCase(),
       reads: formik.values.reads,
       createdAt: serverTimestamp(),
       editedAt: serverTimestamp(),
@@ -89,7 +91,7 @@ const CreateArticleForm: React.FC<CreateArticleFormProps> = ({ isOpen, onClose }
         console.error("Error creating article:", error);
         setShowModal(false);
       }
-
+      setIsLoading(false);
       formik.resetForm();
     }
   };
@@ -196,9 +198,9 @@ const CreateArticleForm: React.FC<CreateArticleFormProps> = ({ isOpen, onClose }
             </FormControl>
           </ModalBody>
           <ModalFooter display={"flex"} justifyContent={"flex-start"} width={"100%"}>
-            <Button colorScheme="blue" mr={3} onClick={formik.handleSubmit as any}>
-              Create
-            </Button>
+          <Button colorScheme="blue" mr={3} onClick={formik.handleSubmit as any} isLoading={isLoading}>
+        {isLoading ? "Loading..." : "Create"} {/* Render different content based on the loading state */}
+      </Button>
           </ModalFooter>
         </ModalContent>
       </Modal>

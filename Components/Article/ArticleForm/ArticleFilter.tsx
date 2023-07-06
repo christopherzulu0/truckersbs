@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { parse } from "date-fns";
 import { Box, Button, Flex, FormControl, FormLabel, Input, Select } from '@chakra-ui/react';
 import { SearchIcon } from '@chakra-ui/icons';
 import { Article } from '@/pages/archives';
 import { useState } from "react";
 import { firestore } from '@/firebase/clientApp';
-import { collection, getDocs, getFirestore, query, where } from 'firebase/firestore';
+import { CollectionReference, DocumentData, Query, collection, endAt, getDocs, getFirestore, orderBy, query, startAt, where } from 'firebase/firestore';
 
 interface ArticleFilterProps {
    articles: Article[];
@@ -18,55 +18,87 @@ const ArticleFilter = ({ articles, setArticles }: ArticleFilterProps) => {
   const [selectedYear, setSelectedYear] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedReads, setSelectedReads] = useState("");
+  
+
+  useEffect(() => {
+    handleFilter();
+  }, [searchText, selectedYear, selectedCategory, selectedReads]);
 
   const handleFilter = async () => {
-    let filteredArticles: any = [];
-  
+    let filteredArticles: Article[] = [];
+
     try {
       const firestore = getFirestore();
       const articlesCollection = collection(firestore, "articles");
       let articlesQuery = query(articlesCollection);
 
+      // if (searchText) {
+      //   const searchQuery = searchText;
+      //   articlesQuery = query(
+      //     articlesCollection,
+      //     orderBy("title"),
+      //     startAt(searchQuery),
+      //     endAt(searchQuery + "\uf8ff")
+      //   );
+      // }
+      if (searchText) {
+        const searchQuery = searchText.toLowerCase();
 
-    if (searchText) {
-      const searchQuery = searchText.toLowerCase();
-      articlesQuery = query(
-        articlesCollection,
-        where("title", ">=", searchQuery),
-        where("title", "<=", searchQuery + "\uf8ff")
-      );
-    }
-  
+        // Fetch all articles from Firestore
+        const querySnapshot = await getDocs(articlesCollection);
+        const articlesData = querySnapshot.docs.map(
+          (doc) => doc.data() as Article
+        );
+
+        // Perform client-side filtering based on the search query
+        const filteredArticleSet = new Set<Article>();
+        articlesData.forEach((article) => {
+          const lowercaseTitle = article.title.toLowerCase();
+          if (lowercaseTitle.includes(searchQuery)) {
+            filteredArticleSet.add(article);
+          }
+        });
+
+        filteredArticles = Array.from(filteredArticleSet);
+        setArticles(filteredArticles);
+      }
+      
+
+      
       if (selectedYear) {
         const startOfYear = new Date(parseInt(selectedYear), 0, 1);
         const endOfYear = new Date(parseInt(selectedYear), 11, 31, 23, 59, 59);
-  
+
         articlesQuery = query(
           articlesCollection,
           where("createdAt", ">=", startOfYear),
           where("createdAt", "<=", endOfYear)
         );
       }
-  
+
       if (selectedCategory) {
         articlesQuery = query(articlesCollection, where("category", "==", selectedCategory));
       }
-  
+
       if (selectedReads) {
         const [minReads, maxReads] = selectedReads.split("-");
-        articlesQuery = query(articlesCollection, where("reads", ">=", parseInt(minReads)), where("reads", "<=", parseInt(maxReads)));
+        articlesQuery = query(
+          articlesCollection,
+          where("reads", ">=", parseInt(minReads)),
+          where("reads", "<=", parseInt(maxReads))
+        );
       }
-  
+
       const querySnapshot = await getDocs(articlesQuery);
       querySnapshot.forEach((doc) => {
-        filteredArticles.push(doc.data());
+        filteredArticles.push(doc.data() as Article);
       });
     } catch (error) {
       console.error("Error retrieving and filtering articles from Firebase:", error);
     }
-  
+
     setArticles(filteredArticles);
-  };  
+  };
 
   const handleReset = () => {
     setSearchText("");
@@ -75,8 +107,6 @@ const ArticleFilter = ({ articles, setArticles }: ArticleFilterProps) => {
     setSelectedReads("");
     setArticles(articles); // Reset to the original list of articles
   };
-
-  console.log('articles ::::', articles);
   
 
   return (
@@ -89,7 +119,8 @@ const ArticleFilter = ({ articles, setArticles }: ArticleFilterProps) => {
       gap={"2"}
       marginTop="180px"
       // marginLeft={{base: '0', sm: '0', md: '20', lg: '28'}}
-      height="700px"
+      height="420px"
+      mb={4}
       boxShadow={"md"}
       display={"flex"}
       justifyContent={"start"}
@@ -142,10 +173,10 @@ const ArticleFilter = ({ articles, setArticles }: ArticleFilterProps) => {
             <option value="">All</option>
             <option value="technology">Technology</option>
             <option value="business">Business</option>
-            <option value="Health">Health</option>
-            <option value="Weather">Weather</option>
-            <option value="Accidents">Accidents</option>
-            <option value="General">General</option>
+            <option value="health">Health</option>
+            <option value="weather">Weather</option>
+            <option value="accidents">Accidents</option>
+            <option value="general">General</option>
           </Select>
         </FormControl>
       </Flex>

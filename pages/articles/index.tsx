@@ -20,7 +20,6 @@ import { FaArrowCircleRight } from "react-icons/fa";
 
 import Footer from "../../Components/Footer"
 import CreateArticleForm from '@/Components/Article/ArticleForm/ArticleForm';
-import { app, firestore } from '@/firebase/clientApp';
 import Link from 'next/link';
 import PostLoader from '@/Components/Post/Loader';
 
@@ -180,7 +179,7 @@ export default function Articles() {
  
   <Flex flexWrap="wrap" gridGap={6} justifyContent={'flex-start'} alignItems={'center'} mb={'2'}>
               
-        {articles?.map((article: any) => (
+        {articles.length > 0 ?  articles?.map((article: any) => (
   <Cards
     key={article.id}
     heading={article.title}
@@ -188,7 +187,16 @@ export default function Articles() {
     description={article.description}
     href={`/articles/${article.id}`}
   />
-))}
+)): (<Box
+display={'flex'}
+justifyContent={'flex-start'}
+alignItems={'center'}
+py={10}
+pl={20}
+width={'100%'}
+>
+<Text color={'red.600'} fontSize={20} fontWeight={600} textAlign={'center'}>No articles yet</Text>
+</Box>)}
         </Flex>
       </Container>
       <Footer />

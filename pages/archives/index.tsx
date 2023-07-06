@@ -121,7 +121,11 @@ const CardSwiper = ({ articles, activeNumber }: any) => {
         >
           <BiLeftArrowAlt size={24} />
         </Button>
-        <Box display="flex" width="full">
+        <Box 
+        display="flex"
+        flexDirection={['column', 'column', 'column', 'row']}
+        width="full"
+        >
           {visibleCards.map((card: Article) => (
             <Box
               key={card.id}
@@ -278,7 +282,7 @@ const Archives = () => {
             justifyContent={"center"}
             flexDirection={"column"}
           >
-            {articles.filter((article) => article.category === "Technology")
+            {articles.filter((article) => article.category === "technology")
               .length > 0 && (
               <Container
                 width={{ base: "100%", sm: "100%", md: "100%", lg: "100%" }}
@@ -298,14 +302,14 @@ const Archives = () => {
                 </Button>
                 <CardSwiper
                   articles={articles.filter(
-                    (article) => article.category === "Technology"
+                    (article) => article.category === "technology"
                   )}
                   activeNumber={activeNumber}
                 />
               </Container>
             )}
 
-            {articles.filter((article) => article.category === "Business")
+            {articles.filter((article) => article.category === "business")
               .length > 0 && (
               <Container
                 width={{ base: "100%", sm: "100%", md: "100%", lg: "100%" }}
@@ -325,14 +329,14 @@ const Archives = () => {
                 </Button>
                 <CardSwiper
                   articles={articles.filter(
-                    (article) => article.category === "Business"
+                    (article) => article.category === "business"
                   )}
                   activeNumber={activeNumber}
                 />
               </Container>
             )}
 
-            {articles.filter((article) => article.category === "Health")
+            {articles.filter((article) => article.category === "health")
               .length > 0 && (
               <Container
                 width={{ base: "100%", sm: "100%", md: "100%", lg: "100%" }}
@@ -352,14 +356,14 @@ const Archives = () => {
                 </Button>
                 <CardSwiper
                   articles={articles.filter(
-                    (article) => article.category === "Health"
+                    (article) => article.category === "health"
                   )}
                   activeNumber={activeNumber}
                 />
               </Container>
             )}
 
-            {articles.filter((article) => article.category === "Weather")
+            {articles.filter((article) => article.category === "weather")
               .length > 0 && (
               <Container
                 width={{ base: "100%", sm: "100%", md: "100%", lg: "100%" }}
@@ -379,14 +383,14 @@ const Archives = () => {
                 </Button>
                 <CardSwiper
                   articles={articles.filter(
-                    (article) => article.category === "Weather"
+                    (article) => article.category === "weather"
                   )}
                   activeNumber={activeNumber}
                 />
               </Container>
             )}
 
-            {articles.filter((article) => article.category === "Accidents")
+            {articles.filter((article) => article.category === "accidents")
               .length > 0 && (
               <Container
                 width={{ base: "100%", sm: "100%", md: "100%", lg: "100%" }}
@@ -406,14 +410,14 @@ const Archives = () => {
                 </Button>
                 <CardSwiper
                   articles={articles.filter(
-                    (article) => article.category === "Accidents"
+                    (article) => article.category === "accidents"
                   )}
                   activeNumber={activeNumber}
                 />
               </Container>
             )}
 
-            {articles.filter((article) => article.category === "General")
+            {articles.filter((article) => article.category === "general")
               .length > 0 && (
               <Container
                 width={{ base: "100%", sm: "100%", md: "100%", lg: "100%" }}
@@ -433,7 +437,7 @@ const Archives = () => {
                 </Button>
                 <CardSwiper
                   articles={articles.filter(
-                    (article) => article.category === "General"
+                    (article) => article.category === "general"
                   )}
                   activeNumber={activeNumber}
                 />
@@ -451,7 +455,7 @@ const Archives = () => {
               </Box>
             )}
 
-            <Box
+            {/* <Box
               display={"flex"}
               justifyContent={"center"}
               alignItems={"center"}
@@ -461,7 +465,7 @@ const Archives = () => {
                 activeNumber={activeNumber}
                 setActiveNumber={setActiveNumber}
               />
-            </Box>
+            </Box> */}
           </Box>
           <Box display={{ base: "none", sm: "none", md: "flex", lg: "flex" }}>
             <ArticleFilter articles={articles} setArticles={setArticles} />
