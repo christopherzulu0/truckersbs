@@ -1,6 +1,16 @@
 import ArticleFilter from "@/Components/Article/ArticleForm/ArticleFilter";
 import Footer from "@/Components/Footer";
-import { Box, Button, Container, Divider, Flex, Heading, Image, Text, useBreakpointValue } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Container,
+  Divider,
+  Flex,
+  Heading,
+  Image,
+  Text,
+  useBreakpointValue,
+} from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import { BiLeftArrowAlt, BiRightArrowAlt } from "react-icons/bi";
 import { useSwipeable } from "react-swipeable";
@@ -8,9 +18,7 @@ import { GoClock } from "react-icons/go";
 import ReusableModal from "@/Components/Article/ArticleForm/ModalReusable";
 import PostLoader from "@/Components/Post/Loader";
 
-const PaginationBox = ({ articles, activeNumber, setActiveNumber}: any) => {
-
-
+const PaginationBox = ({ articles, activeNumber, setActiveNumber }: any) => {
   const handleNext = () => {
     setActiveNumber((prevNumber: number) => prevNumber + 1);
   };
@@ -52,13 +60,14 @@ const PaginationBox = ({ articles, activeNumber, setActiveNumber}: any) => {
           </Button>
         </Box>
       )}
-      {renderNumbers("Weather")} {/* Replace "Weather" with your default category */}
+      {renderNumbers("Weather")}{" "}
+      {/* Replace "Weather" with your default category */}
       <Button onClick={handleNext}>Next</Button>
     </Box>
   );
 };
 
-interface Article {
+export interface Article {
   id: number;
   title: string;
   imageURL: string;
@@ -66,6 +75,7 @@ interface Article {
   category: string;
   reads: number;
   tags: [];
+  createdAt?: string;
 }
 
 const CardSwiper = ({ articles, activeNumber }: any) => {
@@ -134,15 +144,45 @@ const CardSwiper = ({ articles, activeNumber }: any) => {
                 objectFit={"contain"}
                 pt={"2"}
               />
-              <Box p={2} display={"flex"} justifyContent={"center"} alignItems={"center"} flexDirection={"column"}>
-                <Heading as="h2" size="md" overflow="hidden" textOverflow="ellipsis" whiteSpace="nowrap" width="200px" style={{ marginTop: "20px" }} textAlign={"center"}>
+              <Box
+                p={2}
+                display={"flex"}
+                justifyContent={"center"}
+                alignItems={"center"}
+                flexDirection={"column"}
+              >
+                <Heading
+                  as="h2"
+                  size="md"
+                  overflow="hidden"
+                  textOverflow="ellipsis"
+                  whiteSpace="nowrap"
+                  width="200px"
+                  style={{ marginTop: "20px" }}
+                  textAlign={"center"}
+                >
                   {card.title}
                 </Heading>
-                <Text fontSize={"sm"} textAlign={"center"} overflow="hidden" textOverflow="ellipsis" whiteSpace="nowrap" width="200px">
+                <Text
+                  fontSize={"sm"}
+                  textAlign={"center"}
+                  overflow="hidden"
+                  textOverflow="ellipsis"
+                  whiteSpace="nowrap"
+                  width="200px"
+                >
                   {card.description}
                 </Text>
                 <Flex alignItems="center" mt={4}>
-                  <Button rightIcon={<BiRightArrowAlt size={24} />} color={"blue.500"} variant={"unstyled"} fontWeight={"normal"} display={"flex"} justifyContent={"center"} alignItems={"center"}>
+                  <Button
+                    rightIcon={<BiRightArrowAlt size={24} />}
+                    color={"blue.500"}
+                    variant={"unstyled"}
+                    fontWeight={"normal"}
+                    display={"flex"}
+                    justifyContent={"center"}
+                    alignItems={"center"}
+                  >
                     View
                   </Button>
                 </Flex>
@@ -164,7 +204,6 @@ const CardSwiper = ({ articles, activeNumber }: any) => {
     </>
   );
 };
-
 
 const Archives = () => {
   const [articles, setArticles] = useState<Article[]>([]);
@@ -199,61 +238,239 @@ const Archives = () => {
     );
   }
 
-  
-
   return (
     <>
-      <Container maxW={"6xl"} mt={8} display={"flex"} flexDirection={"column"} gap={"4"} justifyContent={"center"}>
+      <Container
+        maxW={"6xl"}
+        mt={8}
+        display={"flex"}
+        flexDirection={"column"}
+        gap={"4"}
+        justifyContent={"center"}
+      >
         <Box width={"full"}>
           <Text fontSize={"2xl"} fontWeight={"normal"}>
             Archive
           </Text>
           <Divider my={4} borderWidth={1} />
+          <Box
+            display={{ sm: "flex", md: "none", lg: "none" }}
+            ml={2}
+            justifyContent={"end"}
+            alignItems={"center"}
+            color={"blue.500"}
+          >
+            <GoClock size={25} onClick={openModal} />
+          </Box>
         </Box>
-        <Box width={{ base: "100%", sm: "100%", md: "100%", lg: "100%" }} mt={4} display={"flex"} justifyContent={"between"} gap={"2"}>
-          <Box width={{ base: "100%", sm: "100%", md: "100%", lg: "70%" }} mt={12} display={"flex"} justifyContent={"center"} flexDirection={"column"}>
-            <Container width={{ base: "100%", sm: "100%", md: "100%", lg: "100%" }} maxWidth={"full"} mt={12} display={"flex"} justifyContent={"center"} flexDirection={"column"}>
-              <Box
-                display={'flex'}
-                justifyContent={{ base: "space-between", sm: "space-between", md: "flex-start", lg: "flex-start" }}
-                alignItems="end"
-                flexDirection="row"
+
+        <Box
+          width={{ base: "100%", sm: "100%", md: "100%", lg: "100%" }}
+          mt={4}
+          display={"flex"}
+          justifyContent={"between"}
+          gap={"2"}
+        >
+          <Box
+            width={{ base: "100%", sm: "100%", md: "100%", lg: "70%" }}
+            mt={12}
+            display={"flex"}
+            justifyContent={"center"}
+            flexDirection={"column"}
+          >
+            {articles.filter((article) => article.category === "Technology")
+              .length > 0 && (
+              <Container
+                width={{ base: "100%", sm: "100%", md: "100%", lg: "100%" }}
+                maxWidth={"full"}
+                mt={12}
+                display={"flex"}
+                justifyContent={"center"}
+                flexDirection={"column"}
               >
-                <Button display={{ base: "flex", sm: "flex", md: "flex", lg: "flex" }} variant="solid" colorScheme="blue" width="100px" ml={2}>
+                <Button
+                  variant="solid"
+                  colorScheme="blue"
+                  width={"100px"}
+                  ml={"12"}
+                >
+                  Technology
+                </Button>
+                <CardSwiper
+                  articles={articles.filter(
+                    (article) => article.category === "Technology"
+                  )}
+                  activeNumber={activeNumber}
+                />
+              </Container>
+            )}
+
+            {articles.filter((article) => article.category === "Business")
+              .length > 0 && (
+              <Container
+                width={{ base: "100%", sm: "100%", md: "100%", lg: "100%" }}
+                maxWidth={"full"}
+                mt={12}
+                display={"flex"}
+                justifyContent={"center"}
+                flexDirection={"column"}
+              >
+                <Button
+                  variant="solid"
+                  colorScheme="blue"
+                  width={"100px"}
+                  ml={"12"}
+                >
+                  Business
+                </Button>
+                <CardSwiper
+                  articles={articles.filter(
+                    (article) => article.category === "Business"
+                  )}
+                  activeNumber={activeNumber}
+                />
+              </Container>
+            )}
+
+            {articles.filter((article) => article.category === "Health")
+              .length > 0 && (
+              <Container
+                width={{ base: "100%", sm: "100%", md: "100%", lg: "100%" }}
+                maxWidth={"full"}
+                mt={12}
+                display={"flex"}
+                justifyContent={"center"}
+                flexDirection={"column"}
+              >
+                <Button
+                  variant="solid"
+                  colorScheme="blue"
+                  width={"100px"}
+                  ml={"12"}
+                >
+                  Health
+                </Button>
+                <CardSwiper
+                  articles={articles.filter(
+                    (article) => article.category === "Health"
+                  )}
+                  activeNumber={activeNumber}
+                />
+              </Container>
+            )}
+
+            {articles.filter((article) => article.category === "Weather")
+              .length > 0 && (
+              <Container
+                width={{ base: "100%", sm: "100%", md: "100%", lg: "100%" }}
+                maxWidth={"full"}
+                mt={12}
+                display={"flex"}
+                justifyContent={"center"}
+                flexDirection={"column"}
+              >
+                <Button
+                  variant="solid"
+                  colorScheme="blue"
+                  width={"100px"}
+                  ml={"12"}
+                >
                   Weather
                 </Button>
-                <Box display={{ sm: "flex", md: "none", lg: "none" }} ml={2} justifyContent={"end"} alignItems={"center"} color={"blue.500"}>
-                  <GoClock size={25} onClick={openModal} />
-                </Box>
+                <CardSwiper
+                  articles={articles.filter(
+                    (article) => article.category === "Weather"
+                  )}
+                  activeNumber={activeNumber}
+                />
+              </Container>
+            )}
+
+            {articles.filter((article) => article.category === "Accidents")
+              .length > 0 && (
+              <Container
+                width={{ base: "100%", sm: "100%", md: "100%", lg: "100%" }}
+                maxWidth={"full"}
+                mt={12}
+                display={"flex"}
+                justifyContent={"center"}
+                flexDirection={"column"}
+              >
+                <Button
+                  variant="solid"
+                  colorScheme="blue"
+                  width={"100px"}
+                  ml={"12"}
+                >
+                  Accidents
+                </Button>
+                <CardSwiper
+                  articles={articles.filter(
+                    (article) => article.category === "Accidents"
+                  )}
+                  activeNumber={activeNumber}
+                />
+              </Container>
+            )}
+
+            {articles.filter((article) => article.category === "General")
+              .length > 0 && (
+              <Container
+                width={{ base: "100%", sm: "100%", md: "100%", lg: "100%" }}
+                maxWidth={"full"}
+                mt={12}
+                display={"flex"}
+                justifyContent={"center"}
+                flexDirection={"column"}
+              >
+                <Button
+                  variant="solid"
+                  colorScheme="blue"
+                  width={"100px"}
+                  ml={"12"}
+                >
+                  General
+                </Button>
+                <CardSwiper
+                  articles={articles.filter(
+                    (article) => article.category === "General"
+                  )}
+                  activeNumber={activeNumber}
+                />
+              </Container>
+            )}
+            {articles.length === 0 && (
+              <Box
+                fontSize="25"
+                display={"flex"}
+                justifyContent={"center"}
+                alignItems={"center"}
+                color="red.500"
+              >
+                No articles found.
               </Box>
-              <CardSwiper articles={articles.filter((article) => article.category === "Weather")} activeNumber={activeNumber}/>
-            </Container>
+            )}
 
-            <Container width={{ base: "100%", sm: "100%", md: "100%", lg: "100%" }} maxWidth={"full"} mt={12} display={"flex"} justifyContent={"center"} flexDirection={"column"}>
-              <Button variant="solid" colorScheme="blue" width={"100px"} ml={"2"}>
-                Accidents
-              </Button>
-              <CardSwiper articles={articles.filter((article) => article.category === "Accidents")} activeNumber={activeNumber}/>
-            </Container>
-
-            <Container width={{ base: "100%", sm: "100%", md: "100%", lg: "100%" }} maxWidth={"full"} mt={12} display={"flex"} justifyContent={"center"} flexDirection={"column"}>
-              <Button variant="solid" colorScheme="blue" width={"100px"} ml={"2"}>
-                General
-              </Button>
-              <CardSwiper articles={articles.filter((article) => article.category === "General")} activeNumber={activeNumber} />
-            </Container>
-
-            <Box display={"flex"} justifyContent={"center"} alignItems={"center"}>
-              <PaginationBox articles={articles} activeNumber={activeNumber} setActiveNumber={setActiveNumber} />
+            <Box
+              display={"flex"}
+              justifyContent={"center"}
+              alignItems={"center"}
+            >
+              <PaginationBox
+                articles={articles}
+                activeNumber={activeNumber}
+                setActiveNumber={setActiveNumber}
+              />
             </Box>
           </Box>
           <Box display={{ base: "none", sm: "none", md: "flex", lg: "flex" }}>
-            <ArticleFilter />
+            <ArticleFilter articles={articles} setArticles={setArticles} />
           </Box>
         </Box>
       </Container>
+
       <ReusableModal isOpen={isOpen} setIsOpen={setIsOpen}>
-        <ArticleFilter />
+        <ArticleFilter articles={articles} setArticles={setArticles} />
       </ReusableModal>
       <Footer />
     </>
