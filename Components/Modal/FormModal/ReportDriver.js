@@ -98,11 +98,6 @@ export default function FormTriggerBtn({ getReports }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // let [hours, minutes] = [currentTime.getHours(), currentTime.getMinutes()];
-    // Process the form data here\
-
-    // handleTimeSetting();
-
     console.log("Company Name:", companyName);
     console.log("Location:", location);
 
@@ -138,6 +133,7 @@ export default function FormTriggerBtn({ getReports }) {
       });
 
       console.log("Document created with ID:", docRef.id);
+      
     } catch (error) {
       console.error("Error creating document:", error);
     } finally {
@@ -148,7 +144,6 @@ export default function FormTriggerBtn({ getReports }) {
       setTime("");
     }
     // Close the modal
-
     onClose();
   };
 
