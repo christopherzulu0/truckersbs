@@ -134,6 +134,27 @@ export default function Articles() {
 // Filter articles by featured equal to true
 const featured = articles.find((article) => article.featured);
 
+// Sort articles by the createdAt timestamp in descending order (most recent first)
+function sortArticlesByRecent(articles: Article[]) {
+  return [...articles].sort((a, b) => {
+    const timestampA = a.createdAt;
+    const timestampB = b.createdAt;
+
+    if (timestampA.seconds === timestampB.seconds) {
+      // If the seconds are equal, compare the nanoseconds
+      return timestampB.nanoseconds - timestampA.nanoseconds;
+    } else {
+      // Compare the seconds
+      return timestampB.seconds - timestampA.seconds;
+    }
+  });
+}
+
+const recentArticles = sortArticlesByRecent(articles);
+
+
+
+
 
 // Sort remaining articles by reads in descending order
 const sortedArticles = articles.filter((article) => !article.featured).sort((a, b) => b.reads - a.reads);
@@ -256,8 +277,8 @@ const featuredArticle = featured || sortedArticles[0];
           alignItems={"center"}
           mb={"2"}
         >
-          {articles.length > 0 ? (
-            articles?.map((article: any) => (
+          {recentArticles.length > 0 ? (
+            recentArticles?.map((article: any) => (
               <Cards
                 key={article.id}
                 heading={article.title}

@@ -80,7 +80,7 @@ export interface Article {
   category: string;
   reads: number;
   tags: [];
-  createdAt?: string;
+  createdAt?: any;
 }
 
 const CardSwiper = ({ articles, activeNumber }: any) => {
