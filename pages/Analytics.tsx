@@ -26,9 +26,10 @@ import { useFormik } from 'formik';
 import { reportValues, reportSchema } from "../Components/validationSchema/report"
 import { firebase } from "../firebase/clientApp";
 import { getFirestore } from "firebase/firestore";
-import { addDoc, collection, updateDoc, doc } from "firebase/firestore";
+import { addDoc, collection, updateDoc, doc, serverTimestamp } from "firebase/firestore";
 import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject } from 'firebase/storage'
 import AccidentReportTable from "../pages/AccidentReportTable"
+import Traffic from "../pages/Traffic"
 
 
 export default function Analytics() {
@@ -41,13 +42,15 @@ export default function Analytics() {
     validationSchema: reportSchema,
     onSubmit: async (values) => {
       try {
-        const report = await addDoc(collection(db, "report"), {
+        const report = await addDoc(collection(db, "analyricsReport"), {
           type: values.type,
           traffic: values.traffic,
           route: values.route,
           condition: values.condition,
           attachment: values.attachment,
           description: values.description,
+          time: serverTimestamp()
+
         });
         console.log("values report", report);
         alert(JSON.stringify(values, null, 2));
@@ -229,8 +232,13 @@ export default function Analytics() {
 
 
       <SimpleGrid columns={2} spacing={10}>
-        <Box bg='tomato' height='80px'>
-
+        <Box height='80px'>
+        <center>
+            <Button colorScheme='blue' size='lg'>
+              Traffic
+            </Button>
+          </center>
+          <Traffic />
         </Box>
         <Box bg='' height='80px'>
           <center>
@@ -240,7 +248,6 @@ export default function Analytics() {
           </center>
           <AccidentReportTable db={db} />
         </Box>
-        <Box bg='tomato' height='80px'></Box>
       </SimpleGrid>
     </>
   )

@@ -28,4 +28,5 @@ export const reportValues = {
   condition: "",
   attachment: "",
   description: "",
+  time: ""
 };

@@ -1,13 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   Table,
   Thead,
   Tbody,
-  Tfoot,
   Tr,
   Th,
   Td,
-  TableCaption,
   TableContainer,
   Spinner,
   Button,
@@ -15,22 +13,13 @@ import {
 import { getReports } from "../Components/fetchData/FetchData";
 import { getFirestore } from "firebase/firestore";
 import { firebase } from "../firebase/clientApp";
-import moment from "moment";
 
-const AccidentReportTable = () => {
+const Traffic = () => {
   const db = getFirestore(firebase);
 
   const [reports, setReport] = useState([]);
 
-  // const fetchAllReports = () => {
-  //   getReports(db).then((data) => {
-  //     console.log("data", data);
-  //     setReport(data);
-  //   });
-  // };
-
  getReports(db).then((data) => {
-    console.log("data", data);
     setReport(data);
   });
 
@@ -44,12 +33,10 @@ const AccidentReportTable = () => {
             <Tbody>
               <Tr>
                 <Td>{report.data.route}</Td>
-                {moment.unix(report?.data?.time).fromNow("LL")}
-                {moment(report.data.time).fromNow("LL")}
                 <Td>
-                  <Button>Talk view</Button>
+                  <Button>Time</Button>
                 </Td>
-                <Td>25.4</Td>
+                <Td>{report.data.traffic} </Td>
               </Tr>
             </Tbody>
           </>
@@ -59,4 +46,4 @@ const AccidentReportTable = () => {
   );
 };
 
-export default AccidentReportTable;
+export default Traffic;

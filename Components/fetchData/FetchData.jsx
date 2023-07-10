@@ -12,7 +12,7 @@ import {
 
 export const getReports = async (db) => {
   const report = await getDocs(
-    query(collection(db, "report"))
+    query(collection(db, "analyricsReport"))
   );
   return report.docs.map((doc) => ({
     id: doc.id,
