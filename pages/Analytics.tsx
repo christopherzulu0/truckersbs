@@ -49,7 +49,7 @@ export default function Analytics() {
     onSubmit: async (values) => {
       try {
         setIsLoading(true)
-        const report = await addDoc(collection(db, "analyricsReport"), {
+        await addDoc(collection(db, "analyricsReport"), {
           type: values.type,
           traffic: values.traffic,
           route: values.route,
