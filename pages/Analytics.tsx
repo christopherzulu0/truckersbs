@@ -20,7 +20,10 @@ import {
   Select,
   Textarea,
   SimpleGrid,
-  Container
+  Container,
+  Alert,
+  AlertIcon,
+  CircularProgress
 } from '@chakra-ui/react'
 import { useFormik } from 'formik';
 import { reportValues, reportSchema } from "../Components/validationSchema/report"
@@ -34,6 +37,9 @@ import Traffic from "../pages/Traffic"
 
 export default function Analytics() {
   const { isOpen, onOpen, onClose } = useDisclosure()
+  const [isLoading, setIsLoading] = useState(false)
+  const [errorMessage, setErrorMessage] = useState("")
+  const [successFull, setSuccessfull] = useState("")
 
   const db = getFirestore(firebase);
 
@@ -42,6 +48,7 @@ export default function Analytics() {
     validationSchema: reportSchema,
     onSubmit: async (values) => {
       try {
+        setIsLoading(true)
         const report = await addDoc(collection(db, "analyricsReport"), {
           type: values.type,
           traffic: values.traffic,
@@ -52,10 +59,11 @@ export default function Analytics() {
           time: serverTimestamp()
 
         });
-        console.log("values report", report);
-        alert(JSON.stringify(values, null, 2));
+        setSuccessfull("Route scheduled Successfully !")
+        setIsLoading(false)
+        onClose()
       } catch (error) {
-        console.log("error", error);
+        setErrorMessage(error.message)
       }
     },
   });
@@ -72,6 +80,14 @@ export default function Analytics() {
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>Modal Title</ModalHeader>
+          {successFull ? (
+            <Alert status='success'>
+              {successFull}
+            </Alert>
+          ) : (<>
+            {errorMessage}
+          </>)}
+
           <ModalCloseButton />
           <ModalBody>
             Analytics
@@ -215,7 +231,8 @@ export default function Analytics() {
               <Center>
                 <ButtonGroup ml={4}>
                   <Button onClick={formik.handleSubmit} colorScheme="blue" type="submit">
-                    Report
+                    {isLoading && isLoading ? (<CircularProgress size={10} color='white' />) : " Report"}
+
                   </Button>
                   <Button colorScheme="blue" onClick={onClose} type="submit">
                     Cancel
@@ -233,7 +250,7 @@ export default function Analytics() {
 
       <SimpleGrid columns={2} spacing={10}>
         <Box height='80px'>
-        <center>
+          <center>
             <Button colorScheme='blue' size='lg'>
               Traffic
             </Button>
