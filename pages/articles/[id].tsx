@@ -22,6 +22,8 @@ import SubscriptionCard from "@/Components/subscription/Subscription";
 import PostLoader from "../../Components/Post/Loader";
 import { BsThreeDots } from "react-icons/bs";
 import EditArticleForm from "@/Components/Article/ArticleForm/EditArticle";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth } from "@/firebase/clientApp";
 
 const SocialMediaLinks = () => {
   return (
@@ -98,23 +100,25 @@ const SocialMediaLinks = () => {
 };
 
 interface Article {
+  articleUserId: string;
   id: number;
   title: string;
   imageURL: string;
   description: string;
   category: string;
   reads: number;
-  tags: []
+  tags: [];
 }
 
 function ArticleDetailsPage() {
   const router = useRouter();
   const { id } = router.query;
   const [article, setArticle] = useState<Article>();
-  const [reads, setReads ] = useState(0);
+  const [reads, setReads] = useState(0);
   const [showSubscription, setShowSubscription] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [user] = useAuthState(auth);
 
   useEffect(() => {
     if (id) {
@@ -136,7 +140,7 @@ function ArticleDetailsPage() {
         });
     }
   }, [id]);
-  
+
   // Increment the reads count when the article is loaded
   useEffect(() => {
     if (article) {
@@ -157,7 +161,7 @@ function ArticleDetailsPage() {
           console.error("Error updating the reads count:", error);
         });
     }
-  }, [article, id]);  
+  }, [article, id]);
 
   if (loading) {
     return (
@@ -180,36 +184,36 @@ function ArticleDetailsPage() {
     setIsOpen(true);
   };
 
-// Handle delete functionality
-const handleDelete = async () => {
-  try {
-    // Make an API call to delete the article
-    const response = await fetch(`/api/articles/${id}`, {
-      method: 'DELETE',
-    });
+  // Handle delete functionality
+  const handleDelete = async () => {
+    try {
+      // Make an API call to delete the article
+      const response = await fetch(`/api/articles/${id}`, {
+        method: "DELETE",
+      });
 
-    if (response.ok) {
-      console.log('Article deleted successfully');
-      // Redirect or perform any additional actions after deleting the article
-    } else {
-      console.error('Failed to delete the article');
+      if (response.ok) {
+        console.log("Article deleted successfully");
+        // Redirect or perform any additional actions after deleting the article
+      } else {
+        console.error("Failed to delete the article");
+      }
+    } catch (error) {
+      console.error("Error deleting the article:", error);
     }
-  } catch (error) {
-    console.error('Error deleting the article:', error);
-  }
-};
+  };
 
-
-  const handleOnClose = ()=> {
+  const handleOnClose = () => {
     setIsOpen(false);
-  }
+  };
 
   const initialValues = {
     title: article.title,
     category: article.category,
     description: article.description,
-    imageURL: article.imageURL
-  }
+    imageURL: article.imageURL,
+  };
+
 
   return (
     <>
@@ -271,15 +275,17 @@ const handleDelete = async () => {
               flexDirection={"column"}
               gap={"4"}
             >
-              <Menu>
-                <MenuButton as={Button} variant="ghost" size="sm">
-                  <BsThreeDots size={20} />
-                </MenuButton>
-                <MenuList>
-                  <MenuItem onClick={handleEdit}>Edit</MenuItem>
-                  <MenuItem onClick={handleDelete}>Delete</MenuItem>
-                </MenuList>
-              </Menu>
+              {user?.uid === article.articleUserId && (
+                <Menu>
+                  <MenuButton as={Button} variant="ghost" size="sm">
+                    <BsThreeDots size={20} />
+                  </MenuButton>
+                  <MenuList>
+                    <MenuItem onClick={handleEdit}>Edit</MenuItem>
+                    <MenuItem onClick={handleDelete}>Delete</MenuItem>
+                  </MenuList>
+                </Menu>
+              )}
               <SocialMediaLinks />
             </Box>
           </Box>
@@ -296,7 +302,14 @@ const handleDelete = async () => {
         </ModalPopup>
       )}
       <DonateComponent setShowSubscription={setShowSubscription} />
-      < EditArticleForm isOpen={isOpen} onClose={handleOnClose} articleId={id as any} initialValues={initialValues}/>
+      {user?.uid === article.articleUserId && (
+        <EditArticleForm
+          isOpen={isOpen}
+          onClose={handleOnClose}
+          articleId={id as any}
+          initialValues={initialValues}
+        />
+      )}{" "}
       <Footer />
     </>
   );

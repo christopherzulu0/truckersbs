@@ -32,15 +32,6 @@ const ArticleFilter = ({ articles, setArticles }: ArticleFilterProps) => {
       const articlesCollection = collection(firestore, "articles");
       let articlesQuery = query(articlesCollection);
 
-      // if (searchText) {
-      //   const searchQuery = searchText;
-      //   articlesQuery = query(
-      //     articlesCollection,
-      //     orderBy("title"),
-      //     startAt(searchQuery),
-      //     endAt(searchQuery + "\uf8ff")
-      //   );
-      // }
       if (searchText) {
         const searchQuery = searchText.toLowerCase();
 
@@ -196,7 +187,6 @@ const ArticleFilter = ({ articles, setArticles }: ArticleFilterProps) => {
           </Select>
         </FormControl>
       </Flex>
-      <Button onClick={handleFilter}>Filter</Button>
       <Button onClick={handleReset}>Reset</Button>
     </Box>
     </>

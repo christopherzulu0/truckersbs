@@ -1,10 +1,31 @@
 import { useState, useEffect } from "react";
-import { Button, FormControl, FormErrorMessage, FormLabel, Input, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, Select } from "@chakra-ui/react";
+import {
+  Button,
+  FormControl,
+  FormErrorMessage,
+  FormLabel,
+  Text,
+  Input,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  Select,
+  Checkbox,
+} from "@chakra-ui/react";
 import dynamic from "next/dynamic";
 import "react-quill/dist/quill.snow.css";
 import { IoIosClose } from "react-icons/io";
-import { app, firestore, storage } from "@/firebase/clientApp";
-import { addDoc, collection, getFirestore, serverTimestamp, updateDoc } from "firebase/firestore";
+import { app, auth, firestore, storage } from "@/firebase/clientApp";
+import {
+  addDoc,
+  collection,
+  getFirestore,
+  serverTimestamp,
+  updateDoc,
+} from "firebase/firestore";
 import { ref, uploadString, getDownloadURL } from "firebase/storage";
 import { useFormik } from "formik";
 import * as Yup from "yup";
@@ -14,9 +35,14 @@ const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
 interface CreateArticleFormProps {
   isOpen: boolean;
   onClose: () => void;
+  articleUserId: string | undefined;
 }
 
-const CreateArticleForm: React.FC<CreateArticleFormProps> = ({ isOpen, onClose }: CreateArticleFormProps) => {
+const CreateArticleForm: React.FC<CreateArticleFormProps> = ({
+  isOpen,
+  onClose,
+  articleUserId,
+}: CreateArticleFormProps) => {
   const [showModal, setShowModal] = useState(false);
   const [tags, setTags] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -29,6 +55,7 @@ const CreateArticleForm: React.FC<CreateArticleFormProps> = ({ isOpen, onClose }
       imageUrl: "",
       tags: [],
       reads: 0,
+      featured: false,
     },
     validationSchema: Yup.object({
       title: Yup.string().required("Title is required"),
@@ -36,7 +63,7 @@ const CreateArticleForm: React.FC<CreateArticleFormProps> = ({ isOpen, onClose }
       description: Yup.string().required("Description is required"),
       imageUrl: Yup.string().required("Image URL is required"),
       tags: Yup.array().of(Yup.string()),
-      reads: Yup.string()
+      reads: Yup.string(),
     }),
     onSubmit: (values: any) => {
       handleCreateArticle();
@@ -56,25 +83,30 @@ const CreateArticleForm: React.FC<CreateArticleFormProps> = ({ isOpen, onClose }
           formik.values.description,
           "text/html"
         );
-    // Clean the description from the Quill editor
-    let cleanDescription = '';
-    if (formik.values.description) {
-      const parser = new DOMParser();
-      const docx = parser.parseFromString(formik.values.description, 'text/html');
-      const paragraphs = Array.from(docx.querySelectorAll('p'));
-      cleanDescription = paragraphs.map((p) => p.textContent).join('\n\n');
-    }
+        // Clean the description from the Quill editor
+        let cleanDescription = "";
+        if (formik.values.description) {
+          const parser = new DOMParser();
+          const docx = parser.parseFromString(
+            formik.values.description,
+            "text/html"
+          );
+          const paragraphs = Array.from(docx.querySelectorAll("p"));
+          cleanDescription = paragraphs.map((p) => p.textContent).join("\n\n");
+        }
 
-    // Create a new article document in the "articles" collection
-    const articleDocRef = await addDoc(collection(firestore, 'articles'), {
-      title: formik.values.title.toLowerCase(),
-      category: formik.values.category.toLowerCase(),
-      description: cleanDescription.toLowerCase(),
-      reads: formik.values.reads,
-      createdAt: serverTimestamp(),
-      editedAt: serverTimestamp(),
-    });
-        console.log("HERE IS NEW POST ID", articleDocRef.id);
+        // Create a new article document in the "articles" collection
+        const articleDocRef = await addDoc(collection(firestore, "articles"), {
+          articleUserId,
+          title: formik.values.title.toLowerCase(),
+          category: formik.values.category.toLowerCase(),
+          description: cleanDescription.toLowerCase(),
+          reads: formik.values.reads,
+          featured: formik.values.featured,
+          createdAt: serverTimestamp(),
+          editedAt: serverTimestamp(),
+        });
+        console.log("HERE IS NEW POST ID", articleDocRef);
 
         const imageRef = ref(storage, `posts/${articleDocRef.id}/image`);
         await uploadString(imageRef, formik.values.imageUrl, "data_url");
@@ -96,6 +128,11 @@ const CreateArticleForm: React.FC<CreateArticleFormProps> = ({ isOpen, onClose }
     }
   };
 
+  const handleFeaturedChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const isChecked = event.target.checked;
+    formik.setFieldValue("featured", isChecked);
+  };
+
   const handleTagChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const inputTags = event.target.value.split(",");
     setTags(inputTags.map((tag) => tag.trim()));
@@ -104,7 +141,6 @@ const CreateArticleForm: React.FC<CreateArticleFormProps> = ({ isOpen, onClose }
   const handleDescriptionChange = (value: string) => {
     formik.setFieldValue("description", value);
   };
-
 
   // Extract the image URL from the description
   const extractImageURL = () => {
@@ -140,14 +176,22 @@ const CreateArticleForm: React.FC<CreateArticleFormProps> = ({ isOpen, onClose }
       <Modal isOpen={isOpen} onClose={onClose} size="xl">
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader display={"flex"} justifyContent={"space-between"} width={"100%"} mt={4}>
+          <ModalHeader
+            display={"flex"}
+            justifyContent={"space-between"}
+            width={"100%"}
+            mt={4}
+          >
             Article
             <Button variant="unstyled" onClick={onClose} color={"blue.500"}>
               <IoIosClose size={30} />
             </Button>
           </ModalHeader>
           <ModalBody maxHeight="400px" overflowY="auto">
-            <FormControl mb={4} isInvalid={formik.touched.title && formik.errors.title as any}>
+            <FormControl
+              mb={4}
+              isInvalid={formik.touched.title && (formik.errors.title as any)}
+            >
               <FormLabel>Title</FormLabel>
               <Input
                 placeholder="Enter article title"
@@ -155,24 +199,38 @@ const CreateArticleForm: React.FC<CreateArticleFormProps> = ({ isOpen, onClose }
               />
               <FormErrorMessage>{formik.errors.title}</FormErrorMessage>
             </FormControl>
-            <FormControl mb={4} isInvalid={formik.touched.category && formik.errors.category as any}>
-  <FormLabel>Category</FormLabel>
-  <Select
-    placeholder="Select article category"
-    {...formik.getFieldProps("category")}
-  >
-    <option value="weather">Weather</option>
-    <option value="accidents">Accidents</option>
-    <option value="general">General</option>
-    <option value="technology">Technology</option>
-    <option value="health">Health</option>
-    <option value="business">Business</option>
-  </Select>
-  <FormErrorMessage>{formik.errors.category}</FormErrorMessage>
-</FormControl>
+            <FormControl
+              mb={4}
+              isInvalid={
+                formik.touched.category && (formik.errors.category as any)
+              }
+            >
+              <FormLabel>Category</FormLabel>
+              <Select
+                placeholder="Select article category"
+                {...formik.getFieldProps("category")}
+              >
+                <option value="weather">Weather</option>
+                <option value="accidents">Accidents</option>
+                <option value="general">General</option>
+                <option value="technology">Technology</option>
+                <option value="health">Health</option>
+                <option value="business">Business</option>
+              </Select>
+              <FormErrorMessage>{formik.errors.category}</FormErrorMessage>
+            </FormControl>
 
-            <FormControl mb={4} isInvalid={formik.touched.description && formik.errors.description as any}>
+            <FormControl
+              mb={4}
+              isInvalid={
+                formik.touched.description && (formik.errors.description as any)
+              }
+            >
               <FormLabel>Description</FormLabel>
+              {/* add a desciption and attach an image to create an article */}
+              <Text fontSize={"sm"} color={"gray.400"} textStyle={"italic"}>
+                Add a description and attach an image to create an article
+              </Text>
               <ReactQuill
                 value={formik.values.description}
                 onChange={handleDescriptionChange}
@@ -187,7 +245,18 @@ const CreateArticleForm: React.FC<CreateArticleFormProps> = ({ isOpen, onClose }
                 }}
               />
               <FormErrorMessage>{formik.errors.description}</FormErrorMessage>
+              <FormErrorMessage>{formik.errors.imageUrl}</FormErrorMessage>
             </FormControl>
+
+            <FormControl mb={4}>
+    <Checkbox
+    isChecked={formik.values.featured}
+    onChange={handleFeaturedChange}
+      name="featured"
+    >
+      Featured Article
+    </Checkbox>
+  </FormControl>
             <FormControl mb={4}>
               <FormLabel>Tags</FormLabel>
               <Input
@@ -197,10 +266,20 @@ const CreateArticleForm: React.FC<CreateArticleFormProps> = ({ isOpen, onClose }
               />
             </FormControl>
           </ModalBody>
-          <ModalFooter display={"flex"} justifyContent={"flex-start"} width={"100%"}>
-          <Button colorScheme="blue" mr={3} onClick={formik.handleSubmit as any} isLoading={isLoading}>
-        {isLoading ? "Loading..." : "Create"} {/* Render different content based on the loading state */}
-      </Button>
+          <ModalFooter
+            display={"flex"}
+            justifyContent={"flex-start"}
+            width={"100%"}
+          >
+            <Button
+              colorScheme="blue"
+              mr={3}
+              onClick={formik.handleSubmit as any}
+              isLoading={isLoading}
+            >
+              {isLoading ? "Loading..." : "Create"}{" "}
+              {/* Render different content based on the loading state */}
+            </Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
@@ -210,7 +289,11 @@ const CreateArticleForm: React.FC<CreateArticleFormProps> = ({ isOpen, onClose }
           <ModalOverlay />
           <ModalContent width={"500px"} height={"300px"} mt={20}>
             <ModalHeader display="flex" justifyContent="flex-end">
-              <Button variant="unstyled" color={"blue.500"} onClick={() => setShowModal(false)}>
+              <Button
+                variant="unstyled"
+                color={"blue.500"}
+                onClick={() => setShowModal(false)}
+              >
                 <IoIosClose size={24} />
               </Button>
             </ModalHeader>

@@ -8,6 +8,7 @@ import {
   Flex,
   Heading,
   Image,
+  Link,
   Text,
   useBreakpointValue,
 } from "@chakra-ui/react";
@@ -17,6 +18,9 @@ import { useSwipeable } from "react-swipeable";
 import { GoClock } from "react-icons/go";
 import ReusableModal from "@/Components/Article/ArticleForm/ModalReusable";
 import PostLoader from "@/Components/Post/Loader";
+import Articles from "../articles/index";
+import { firestore } from "@/firebase/clientApp";
+import { getDocs, collection } from "firebase/firestore";
 
 const PaginationBox = ({ articles, activeNumber, setActiveNumber }: any) => {
   const handleNext = () => {
@@ -68,6 +72,7 @@ const PaginationBox = ({ articles, activeNumber, setActiveNumber }: any) => {
 };
 
 export interface Article {
+  featured: unknown;
   id: number;
   title: string;
   imageURL: string;
@@ -81,6 +86,8 @@ export interface Article {
 const CardSwiper = ({ articles, activeNumber }: any) => {
   const [currentIndex, setCurrentIndex] = useState((activeNumber - 1) * 2);
   const cards = articles;
+
+  // console.log('articles :', articles);
 
   useEffect(() => {
     setCurrentIndex((activeNumber - 1) * 2);
@@ -113,18 +120,25 @@ const CardSwiper = ({ articles, activeNumber }: any) => {
       >
         {/* Previous button */}
         <Button
+          display={'flex'}
+          justifyContent={'center'}
+          alignContent={'center'}
           disabled={currentIndex === 0}
           onClick={() => handleSwipe("right")}
           variant="unstyled"
           color="blue.500"
           colorScheme="blue"
+          bg={'gray.200'}
+          borderRadius={'full'}
+          shadow={'md'}
+          mr={-30}
         >
           <BiLeftArrowAlt size={24} />
         </Button>
-        <Box 
-        display="flex"
-        flexDirection={['column', 'column', 'column', 'row']}
-        width="full"
+        <Box
+          display="flex"
+          flexDirection={["column", "column", "column", "row"]}
+          width="full"
         >
           {visibleCards.map((card: Article) => (
             <Box
@@ -177,7 +191,8 @@ const CardSwiper = ({ articles, activeNumber }: any) => {
                 >
                   {card.description}
                 </Text>
-                <Flex alignItems="center" mt={4}>
+                <Flex alignItems="center" mt={4} textDecoration={'none'}>
+                  <Link href={`/archives/${card?.id}`} textDecoration={'none'}>
                   <Button
                     rightIcon={<BiRightArrowAlt size={24} />}
                     color={"blue.500"}
@@ -186,9 +201,11 @@ const CardSwiper = ({ articles, activeNumber }: any) => {
                     display={"flex"}
                     justifyContent={"center"}
                     alignItems={"center"}
+                    textDecoration={'none'}
                   >
                     View
                   </Button>
+                  </Link>
                 </Flex>
               </Box>
             </Box>
@@ -196,11 +213,18 @@ const CardSwiper = ({ articles, activeNumber }: any) => {
         </Box>
         {/* Next button */}
         <Button
+          display={'flex'}
+          justifyContent={'center'}
+          alignContent={'center'}
           disabled={currentIndex === cards.length - 2}
           onClick={() => handleSwipe("left")}
           variant="unstyled"
           colorScheme="blue"
           color="blue.500"
+          bg={'gray.200'}
+          borderRadius={'full'}
+          shadow={'md'}
+          ml={-30}
         >
           <BiRightArrowAlt size={24} />
         </Button>
@@ -215,32 +239,34 @@ const Archives = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [activeNumber, setActiveNumber] = useState(1);
 
-  useEffect(() => {
-    setLoading(true);
+  const getArchives = async() => {
+    const articlesSnapshot = await getDocs(collection(firestore, "articles"));
+    const articlesData = articlesSnapshot.docs.map((doc) => ({
+      ...doc.data(),
+      id: doc.id,
+    }));
 
-    fetch("/api/articles")
-      .then((response) => response.json())
-      .then((data) => {
-        setArticles(data.articles);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error("Error fetching articles:", error);
-        setLoading(false);
-      });
-  }, []);
+   setArticles(articlesData as unknown as Article[])
+  }
+
+  useEffect(() => {
+   getArchives()
+  },[])
+  
+
+  
 
   const openModal = () => {
     setIsOpen(true);
   };
 
-  if (loading) {
-    return (
-      <Container>
-        <PostLoader />
-      </Container>
-    );
-  }
+  // if (loading) {
+  //   return (
+  //     <Container>
+  //       <PostLoader />
+  //     </Container>
+  //   );
+  // }
 
   return (
     <>
@@ -282,8 +308,10 @@ const Archives = () => {
             justifyContent={"center"}
             flexDirection={"column"}
           >
-            {articles.filter((article) => article.category === "technology")
-              .length > 0 && (
+            {articles
+              .filter((article) => article.category === "technology")
+              .map((article) => ({ ...article, id: article.id })).length >
+              0 && (
               <Container
                 width={{ base: "100%", sm: "100%", md: "100%", lg: "100%" }}
                 maxWidth={"full"}
@@ -301,16 +329,18 @@ const Archives = () => {
                   Technology
                 </Button>
                 <CardSwiper
-                  articles={articles.filter(
-                    (article) => article.category === "technology"
-                  )}
+                  articles={articles
+                    .filter((article) => article.category === "technology")
+                    .map((article) => ({ ...article, id: article.id }))}
                   activeNumber={activeNumber}
                 />
               </Container>
             )}
 
-            {articles.filter((article) => article.category === "business")
-              .length > 0 && (
+            {articles
+              .filter((article) => article.category === "business")
+              .map((article) => ({ ...article, id: article.id })).length >
+              0 && (
               <Container
                 width={{ base: "100%", sm: "100%", md: "100%", lg: "100%" }}
                 maxWidth={"full"}
@@ -328,16 +358,18 @@ const Archives = () => {
                   Business
                 </Button>
                 <CardSwiper
-                  articles={articles.filter(
-                    (article) => article.category === "business"
-                  )}
+                  articles={articles
+                    .filter((article) => article.category === "business")
+                    .map((article) => ({ ...article, id: article.id }))}
                   activeNumber={activeNumber}
                 />
               </Container>
             )}
 
-            {articles.filter((article) => article.category === "health")
-              .length > 0 && (
+            {articles
+              .filter((article) => article.category === "health")
+              .map((article) => ({ ...article, id: article.id })).length >
+              0 && (
               <Container
                 width={{ base: "100%", sm: "100%", md: "100%", lg: "100%" }}
                 maxWidth={"full"}
@@ -355,16 +387,18 @@ const Archives = () => {
                   Health
                 </Button>
                 <CardSwiper
-                  articles={articles.filter(
-                    (article) => article.category === "health"
-                  )}
+                  articles={articles
+                    .filter((article) => article.category === "health")
+                    .map((article) => ({ ...article, id: article.id }))}
                   activeNumber={activeNumber}
                 />
               </Container>
             )}
 
-            {articles.filter((article) => article.category === "weather")
-              .length > 0 && (
+            {articles
+              .filter((article) => article.category === "weather")
+              .map((article) => ({ ...article, id: article.id })).length >
+              0 && (
               <Container
                 width={{ base: "100%", sm: "100%", md: "100%", lg: "100%" }}
                 maxWidth={"full"}
@@ -382,16 +416,18 @@ const Archives = () => {
                   Weather
                 </Button>
                 <CardSwiper
-                  articles={articles.filter(
-                    (article) => article.category === "weather"
-                  )}
+                  articles={articles
+                    .filter((article) => article.category === "weather")
+                    .map((article) => ({ ...article, id: article.id }))}
                   activeNumber={activeNumber}
                 />
               </Container>
             )}
 
-            {articles.filter((article) => article.category === "accidents")
-              .length > 0 && (
+            {articles
+              .filter((article) => article.category === "accidents")
+              .map((article) => ({ ...article, id: article.id })).length >
+              0 && (
               <Container
                 width={{ base: "100%", sm: "100%", md: "100%", lg: "100%" }}
                 maxWidth={"full"}
@@ -409,16 +445,18 @@ const Archives = () => {
                   Accidents
                 </Button>
                 <CardSwiper
-                  articles={articles.filter(
-                    (article) => article.category === "accidents"
-                  )}
+                  articles={articles
+                    .filter((article) => article.category === "accidents")
+                    .map((article) => ({ ...article, id: article.id }))}
                   activeNumber={activeNumber}
                 />
               </Container>
             )}
 
-            {articles.filter((article) => article.category === "general")
-              .length > 0 && (
+            {articles
+              .filter((article) => article.category === "general")
+              .map((article) => ({ ...article, id: article.id })).length >
+              0 && (
               <Container
                 width={{ base: "100%", sm: "100%", md: "100%", lg: "100%" }}
                 maxWidth={"full"}
@@ -436,24 +474,34 @@ const Archives = () => {
                   General
                 </Button>
                 <CardSwiper
-                  articles={articles.filter(
-                    (article) => article.category === "general"
-                  )}
+                  articles={articles
+                    .filter((article) => article.category === "general")
+                    .map((article) => ({ ...article, id: article.id }))}
                   activeNumber={activeNumber}
                 />
               </Container>
             )}
-            {articles.length === 0 && (
-              <Box
-                fontSize="25"
-                display={"flex"}
-                justifyContent={"center"}
-                alignItems={"center"}
-                color="red.500"
-              >
-                No articles found.
-              </Box>
-            )}
+
+            {
+              articles.length === 0 && (
+                <Box
+                  display={"flex"}
+                  justifyContent={"center"}
+                  alignItems={"center"}
+                  flexDirection={"column"}
+                >
+                  <Heading as="h2" size="md" textAlign={"center"}>
+                    No articles found
+                  </Heading>
+                  <Text fontSize={"sm"} textAlign={
+                    "center"
+                  }>
+                    Please try again later
+                  </Text>
+                </Box>
+              )
+            }
+
 
             {/* <Box
               display={"flex"}
