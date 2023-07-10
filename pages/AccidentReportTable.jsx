@@ -39,10 +39,11 @@ const AccidentReportTable = () => {
       <Table>
         <Thead>
         </Thead>
-        {reports.map((report) => (
+        {reports.map((report,index) => (
           <>
             <Tbody>
               <Tr>
+              <Td>{index + 1}</Td>
                 <Td>{report.data.route}</Td>
                 {moment.unix(report?.data?.time).fromNow("LL")}
                 {moment(report.data.time).fromNow("LL")}

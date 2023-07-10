@@ -28,10 +28,11 @@ const Traffic = () => {
       <Table>
         <Thead>
         </Thead>
-        {reports.map((report) => (
+        {reports.map((report, index) => (
           <>
             <Tbody>
               <Tr>
+                <Td>{index + 1}</Td>
                 <Td>{report.data.route}</Td>
                 <Td>
                   <Button>Time</Button>
