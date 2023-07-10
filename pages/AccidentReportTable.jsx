@@ -22,13 +22,6 @@ const AccidentReportTable = () => {
 
   const [reports, setReport] = useState([]);
 
-  // const fetchAllReports = () => {
-  //   getReports(db).then((data) => {
-  //     console.log("data", data);
-  //     setReport(data);
-  //   });
-  // };
-
  getReports(db).then((data) => {
     console.log("data", data);
     setReport(data);
