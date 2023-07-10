@@ -249,14 +249,14 @@ const CreateArticleForm: React.FC<CreateArticleFormProps> = ({
             </FormControl>
 
             <FormControl mb={4}>
-    <Checkbox
-    isChecked={formik.values.featured}
-    onChange={handleFeaturedChange}
-      name="featured"
-    >
-      Featured Article
-    </Checkbox>
-  </FormControl>
+              <Checkbox
+                isChecked={formik.values.featured}
+                onChange={handleFeaturedChange}
+                name="featured"
+              >
+                Featured Article
+              </Checkbox>
+            </FormControl>
             <FormControl mb={4}>
               <FormLabel>Tags</FormLabel>
               <Input

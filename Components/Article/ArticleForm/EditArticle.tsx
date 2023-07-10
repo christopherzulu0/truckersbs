@@ -12,6 +12,7 @@ import {
   ModalFooter,
   FormErrorMessage,
   FormHelperText,
+  Checkbox,
 } from "@chakra-ui/react";
 import dynamic from "next/dynamic";
 import "react-quill/dist/quill.snow.css";
@@ -33,6 +34,7 @@ interface EditArticleFormProps {
     category: string;
     description: string;
     imageURL: string;
+    featured: boolean;
   };
 }
 
@@ -46,6 +48,7 @@ const EditArticleForm: React.FC<EditArticleFormProps> = ({
   const [tags, setTags] = useState<string[]>([]);
 
   const handleEditArticle = async (values: {
+    featured: boolean;
     description: string;
     title: any;
     category: string;
@@ -69,6 +72,11 @@ const EditArticleForm: React.FC<EditArticleFormProps> = ({
       if (values.imageURL) {
         updateData.imageURL = values.imageURL;
       }
+
+      if(values.featured) {
+        updateData.featured = values.featured;
+      }
+
       if (values.description) {
         // Clean the description from the Quill editor
         const parser = new DOMParser();
@@ -103,6 +111,7 @@ const EditArticleForm: React.FC<EditArticleFormProps> = ({
 
   const formik = useFormik({
     initialValues: initialValues || {
+      featured: false,
       title: "",
       category: "",
       description: "",
@@ -139,6 +148,12 @@ const EditArticleForm: React.FC<EditArticleFormProps> = ({
       }
     }
   };
+
+  // add featured;
+  const handleFeaturedChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const isChecked = event.target.checked;
+    formik.setFieldValue("featured", isChecked);
+  };
   
 
   useEffect(() => {
@@ -146,6 +161,7 @@ const EditArticleForm: React.FC<EditArticleFormProps> = ({
     formik.setFieldValue("category", initialValues?.category || "");
     formik.setFieldValue("description", initialValues?.description || "");
     formik.setFieldValue("imageURL", initialValues?.imageURL || "");
+    formik.setFieldValue("featured", initialValues?.featured || false);
   }, [initialValues]);
 
   return (
@@ -211,6 +227,16 @@ const EditArticleForm: React.FC<EditArticleFormProps> = ({
               />
               <FormErrorMessage>{formik.errors.description}</FormErrorMessage>
             </FormControl>
+
+            <FormControl mb={4}>
+              <Checkbox
+                isChecked={formik.values.featured}
+                onChange={handleFeaturedChange}
+                name="featured"
+              >
+                Featured Article
+              </Checkbox>
+            </FormControl>
             <FormControl mb={4}>
               <FormLabel>Tags</FormLabel>
               <Input
@@ -220,10 +246,16 @@ const EditArticleForm: React.FC<EditArticleFormProps> = ({
               />
             </FormControl>
             <FormControl>
-  <FormLabel>Image</FormLabel>
-  <Input type="file" onChange={handleImageUpload} accept="image/*" />
-  <FormHelperText>Select a new image for the article</FormHelperText>
-</FormControl>
+              <FormLabel>Image</FormLabel>
+              <Input
+                type="file"
+                onChange={handleImageUpload}
+                accept="image/*"
+              />
+              <FormHelperText>
+                Select a new image for the article
+              </FormHelperText>
+            </FormControl>
           </ModalBody>
           <ModalFooter
             display={"flex"}
