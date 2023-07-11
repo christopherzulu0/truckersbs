@@ -73,7 +73,7 @@ const EditArticleForm: React.FC<EditArticleFormProps> = ({
         updateData.imageURL = values.imageURL;
       }
 
-      if(values.featured) {
+      if(values.featured || values.featured === false) {
         updateData.featured = values.featured;
       }
 
@@ -88,6 +88,8 @@ const EditArticleForm: React.FC<EditArticleFormProps> = ({
         updateData.description = cleanDescription;
       }
 
+      console.log('updated values :::', updateData);
+      
       await updateDoc(articleRef, updateData);
 
       console.log("Article updated");
@@ -154,6 +156,8 @@ const EditArticleForm: React.FC<EditArticleFormProps> = ({
     const isChecked = event.target.checked;
     formik.setFieldValue("featured", isChecked);
   };
+
+  
   
 
   useEffect(() => {

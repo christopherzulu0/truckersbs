@@ -31,7 +31,7 @@ const SocialMediaLinks = () => {
       display="flex"
       flexDirection="column"
       shadow={"sm"}
-      gap={"8"}
+      gap={[2, 2, 4, 8]}
       p={"2"}
       mb={"2"}
     >
@@ -44,7 +44,7 @@ const SocialMediaLinks = () => {
           <Image
             src="/images/whatsapp.png"
             alt="WhatsApp"
-            boxSize={10}
+            boxSize={[8, 8, 10, 10]}
             mr={2}
             transform="rotate(-90deg)"
           />
@@ -59,7 +59,7 @@ const SocialMediaLinks = () => {
           <Image
             src="/images/in.png"
             alt="LinkedIn"
-            boxSize={10}
+            boxSize={[8, 8, 10, 10]}
             mr={2}
             transform="rotate(-90deg)"
           />
@@ -74,7 +74,7 @@ const SocialMediaLinks = () => {
           <Image
             src="/images/insta.png"
             alt="Instagram"
-            boxSize={10}
+            boxSize={[8, 8, 10, 10]}
             mr={2}
             transform="rotate(-90deg)"
           />
@@ -89,7 +89,7 @@ const SocialMediaLinks = () => {
           <Image
             src="/images/fb.png"
             alt="Facebook"
-            boxSize={10}
+            boxSize={[8, 8, 10, 10]}
             mr={2}
             transform="rotate(-90deg)"
           />
@@ -100,6 +100,7 @@ const SocialMediaLinks = () => {
 };
 
 interface Article {
+  featured: boolean;
   articleUserId: string;
   id: number;
   title: string;
@@ -119,6 +120,8 @@ function ArticleDetailsPage() {
   const [loading, setLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [user] = useAuthState(auth);
+  const [showModal, setShowModal] = useState(false);
+
 
   useEffect(() => {
     if (id) {
@@ -139,7 +142,17 @@ function ArticleDetailsPage() {
           setLoading(false);
         });
     }
-  }, [id]);
+
+    if (showModal) {
+      const timer = setTimeout(() => {
+        setShowModal(false);
+      }, 5000);
+
+      return () => {
+        clearTimeout(timer);
+      };
+    }
+  }, [id, showModal]);
 
   // Increment the reads count when the article is loaded
   useEffect(() => {
@@ -193,6 +206,7 @@ function ArticleDetailsPage() {
       });
 
       if (response.ok) {
+        setShowModal(true); // Show the
         console.log("Article deleted successfully");
         // Redirect or perform any additional actions after deleting the article
       } else {
@@ -201,6 +215,7 @@ function ArticleDetailsPage() {
     } catch (error) {
       console.error("Error deleting the article:", error);
     }
+    
   };
 
   const handleOnClose = () => {
@@ -212,6 +227,7 @@ function ArticleDetailsPage() {
     category: article.category,
     description: article.description,
     imageURL: article.imageURL,
+    featured: article?.featured,
   };
 
 
@@ -244,7 +260,7 @@ function ArticleDetailsPage() {
             display={"flex"}
             justifyContent={"flex-start"}
             alignItems={"flex-start"}
-            ml={"20"}
+            ml={[0, 0, 20 , 20]}
             mb={"4"}
             width={"100%"}
           >
@@ -256,24 +272,27 @@ function ArticleDetailsPage() {
             display={"flex"}
             justifyContent={"center"}
             alignItems={"center"}
-            gap={"10"}
+            gap={[2, 2, 4, 8]}
             width={"100%"}
+            height={{ base: "100%", sm: "100%"}}
           >
             <Image
               src={article.imageURL}
               alt={article.title}
-              boxSize={700}
-              maxH="400px"
+              boxSize={[200, 200, 400, 700]}
+              maxH={[200, 200, 300, 400]}
               objectFit={"contain"}
               mb={4}
               maxW={{ base: "100%", sm: "100%", md: "100%", lg: "100%" }}
+              width={{ base: "100%", sm: "100%", md: "100%", lg: "100%" }}
+              pl={{base: '27px', sm: '27px'}}
             />
             <Box
               display={"flex"}
               justifyContent={"center"}
               alignItems={"flex-start"}
               flexDirection={"column"}
-              gap={"4"}
+              gap={[2,2,4,4]}
             >
               {user?.uid === article.articleUserId && (
                 <Menu>
@@ -289,7 +308,7 @@ function ArticleDetailsPage() {
               <SocialMediaLinks />
             </Box>
           </Box>
-          <Box width={"80%"}>
+          <Box width={['100%', '100%', '80%', '80%']} >
             <Text mt={4} fontSize="20px">
               {article.description}
             </Text>

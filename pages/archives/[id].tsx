@@ -13,17 +13,24 @@ import {
   MenuButton,
   MenuItem,
   MenuList,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalHeader,
+  ModalOverlay,
   Text,
 } from "@chakra-ui/react";
 import DonateComponent, {
   ModalPopup,
 } from "@/Components/Article/ArticleForm/DonatePopUp";
 import SubscriptionCard from "@/Components/subscription/Subscription";
+
 import PostLoader from "../../Components/Post/Loader";
 import { BsThreeDots } from "react-icons/bs";
 import EditArticleForm from "@/Components/Article/ArticleForm/EditArticle";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/firebase/clientApp";
+import { IoIosClose } from "react-icons/io";
 
 const SocialMediaLinks = () => {
   return (
@@ -31,7 +38,7 @@ const SocialMediaLinks = () => {
       display="flex"
       flexDirection="column"
       shadow={"sm"}
-      gap={"8"}
+      gap={[2, 2, 4, 8]}
       p={"2"}
       mb={"2"}
     >
@@ -44,7 +51,7 @@ const SocialMediaLinks = () => {
           <Image
             src="/images/whatsapp.png"
             alt="WhatsApp"
-            boxSize={10}
+            boxSize={[8, 8, 10, 10]}
             mr={2}
             transform="rotate(-90deg)"
           />
@@ -59,7 +66,7 @@ const SocialMediaLinks = () => {
           <Image
             src="/images/in.png"
             alt="LinkedIn"
-            boxSize={10}
+            boxSize={[8, 8, 10, 10]}
             mr={2}
             transform="rotate(-90deg)"
           />
@@ -74,7 +81,7 @@ const SocialMediaLinks = () => {
           <Image
             src="/images/insta.png"
             alt="Instagram"
-            boxSize={10}
+            boxSize={[8, 8, 10, 10]}
             mr={2}
             transform="rotate(-90deg)"
           />
@@ -89,7 +96,7 @@ const SocialMediaLinks = () => {
           <Image
             src="/images/fb.png"
             alt="Facebook"
-            boxSize={10}
+            boxSize={[8, 8, 10, 10]}
             mr={2}
             transform="rotate(-90deg)"
           />
@@ -119,6 +126,8 @@ function ArchivesDetailsPage() {
   const [loading, setLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [user] = useAuthState(auth);
+  const [showModal, setShowModal] = useState(false);
+
 
   useEffect(() => {
     if (id) {
@@ -139,7 +148,17 @@ function ArchivesDetailsPage() {
           setLoading(false);
         });
     }
-  }, [id]);
+
+    if (showModal) {
+      const timer = setTimeout(() => {
+        setShowModal(false);
+      }, 5000);
+
+      return () => {
+        clearTimeout(timer);
+      };
+    }
+  }, [id, showModal]);
   
   // Increment the reads count when the article is loaded
   useEffect(() => {
@@ -184,8 +203,11 @@ function ArchivesDetailsPage() {
     setIsOpen(true);
   };
 
+    // Show article created modal for 1 second
+  
 // Handle delete functionality
 const handleDelete = async () => {
+  setShowModal(false);
   try {
     // Make an API call to delete the article
     const response = await fetch(`/api/archives/${id}`, {
@@ -193,6 +215,7 @@ const handleDelete = async () => {
     });
 
     if (response.ok) {
+      setShowModal(true);
       console.log('Article deleted successfully');
       // Redirect or perform any additional actions after deleting the article
     } else {
@@ -212,7 +235,8 @@ const handleDelete = async () => {
     title: article.title,
     category: article.category,
     description: article.description,
-    imageURL: article.imageURL
+    imageURL: article.imageURL,
+    featured: false,
   }
 
   return (
@@ -244,7 +268,7 @@ const handleDelete = async () => {
             display={"flex"}
             justifyContent={"flex-start"}
             alignItems={"flex-start"}
-            ml={"20"}
+            ml={[0, 0, 20 , 20]}
             mb={"4"}
             width={"100%"}
           >
@@ -256,24 +280,25 @@ const handleDelete = async () => {
             display={"flex"}
             justifyContent={"center"}
             alignItems={"center"}
-            gap={"10"}
+            gap={[2, 2, 4, 8]}
             width={"100%"}
           >
             <Image
               src={article.imageURL}
               alt={article.title}
-              boxSize={700}
-              maxH="400px"
+              boxSize={[200, 200, 400, 700]}
+              maxH={[200, 200, 300, 400]}
               objectFit={"contain"}
               mb={4}
               maxW={{ base: "100%", sm: "100%", md: "100%", lg: "100%" }}
+              width={{ base: "100%", sm: "100%", md: "100%", lg: "100%" }}
             />
             <Box
               display={"flex"}
               justifyContent={"center"}
               alignItems={"flex-start"}
               flexDirection={"column"}
-              gap={"4"}
+              gap={[2,2,4,4]}
             >
              {user?.uid === article.articleUserId && <Menu>
                 <MenuButton as={Button} variant="ghost" size="sm">
@@ -287,8 +312,8 @@ const handleDelete = async () => {
               <SocialMediaLinks />
             </Box>
           </Box>
-          <Box width={"80%"}>
-            <Text mt={4} fontSize="20px">
+          <Box width={['100%', '100%', '80%', '80%']} >
+            <Text mt={4} fontSize="20px" textAlign={['center', 'center', 'start', 'start']} >
               {article.description}
             </Text>
           </Box>
@@ -300,7 +325,27 @@ const handleDelete = async () => {
         </ModalPopup>
       )}
       <DonateComponent setShowSubscription={setShowSubscription} />
-  { user?.uid === article.articleUserId &&  < EditArticleForm isOpen={isOpen} onClose={handleOnClose} articleId={id as any} initialValues={initialValues}/>}      <Footer />
+  { user?.uid === article.articleUserId &&  < EditArticleForm isOpen={isOpen} onClose={handleOnClose} articleId={id as any} initialValues={initialValues}/>}   
+  {showModal && (
+        <Modal isOpen={showModal} onClose={() => setShowModal(false)} size="lg">
+          <ModalOverlay />
+          <ModalContent width={"500px"} height={"300px"} mt={20}>
+            <ModalHeader display="flex" justifyContent="flex-end">
+              <Button
+                variant="unstyled"
+                color={"blue.500"}
+                onClick={() => setShowModal(false)}
+              >
+                <IoIosClose size={24} />
+              </Button>
+            </ModalHeader>
+            <ModalBody textAlign="center" mt={"14"} fontSize={25}>
+              Article deleted successfully!
+            </ModalBody>
+          </ModalContent>
+        </Modal>
+      )}
+     <Footer />
     </>
   );
 }

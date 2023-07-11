@@ -19,9 +19,9 @@ const ReusableModal = ({ children, isOpen, setIsOpen}: ReusableModalProps) => {
 
   return (
     <>
-      <Modal isOpen={isOpen} onClose={handleClose} size="md">
+      <Modal isOpen={isOpen} onClose={handleClose} size="md"  >
         <ModalOverlay />
-        <ModalContent>
+        <ModalContent width={['90%', '90%', 'full', 'full']}>
           <ModalCloseButton />
           <ModalBody>{children}</ModalBody>
         </ModalContent>

@@ -100,7 +100,7 @@ const CreateArticleForm: React.FC<CreateArticleFormProps> = ({
           articleUserId,
           title: formik.values.title.toLowerCase(),
           category: formik.values.category.toLowerCase(),
-          description: cleanDescription.toLowerCase(),
+          description: cleanDescription,
           reads: formik.values.reads,
           featured: formik.values.featured,
           createdAt: serverTimestamp(),
