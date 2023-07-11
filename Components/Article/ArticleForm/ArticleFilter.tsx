@@ -99,6 +99,12 @@ const ArticleFilter = ({ articles, setArticles, setIsOpen }: ArticleFilterProps)
     handleFilter();
   };
 
+  useEffect(()=>{
+    if(searchText == "") {
+      handleReset();
+    }
+  })
+
   const handleReset = () => {
     setSearchText("");
     setSelectedYear("");

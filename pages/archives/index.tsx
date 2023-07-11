@@ -129,6 +129,7 @@ const CardSwiper = ({ articles, activeNumber }: any) => {
       <Box
         display="flex"
         mt={10}
+        mb={4}
         width="full"
         justifyContent="start"
         alignItems="center"
