@@ -11,6 +11,7 @@ import {
   Link,
   Text,
   useBreakpointValue,
+  useMediaQuery,
 } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import { BiLeftArrowAlt, BiRightArrowAlt } from "react-icons/bi";
@@ -80,14 +81,16 @@ export interface Article {
   category: string;
   reads: number;
   tags: [];
-  createdAt?: any;
+  createdAt?: string;
 }
 
 const CardSwiper = ({ articles, activeNumber }: any) => {
   const [currentIndex, setCurrentIndex] = useState((activeNumber - 1) * 2);
   const cards = articles;
+  const [isSmallScreen] = useMediaQuery("(max-width: 768px)");
 
-  // console.log('articles :', articles);
+  console.log('isSmallScreen :', isSmallScreen);
+
 
   useEffect(() => {
     setCurrentIndex((activeNumber - 1) * 2);
@@ -106,7 +109,16 @@ const CardSwiper = ({ articles, activeNumber }: any) => {
     onSwipedRight: () => handleSwipe("right"),
   });
 
-  const visibleCards = cards.slice(currentIndex, currentIndex + 2);
+
+  type Articles = Article[];
+
+   let visibleCards: Articles = [];
+
+   if(isSmallScreen) {
+    visibleCards = cards.slice(currentIndex, currentIndex + 1);
+   } else {
+   visibleCards = cards.slice(currentIndex, currentIndex + 2);
+   }
 
   return (
     <>
@@ -137,7 +149,7 @@ const CardSwiper = ({ articles, activeNumber }: any) => {
         </Button>
         <Box
           display="flex"
-          flexDirection={["column", "column", "column", "row"]}
+          flexDirection={["column", "column", "row", "row"]}
           width="full"
         >
           {visibleCards.map((card: Article) => (

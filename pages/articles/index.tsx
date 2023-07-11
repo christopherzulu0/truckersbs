@@ -140,12 +140,12 @@ function sortArticlesByRecent(articles: Article[]) {
     const timestampA = a.createdAt;
     const timestampB = b.createdAt;
 
-    if (timestampA.seconds === timestampB.seconds) {
+    if (timestampA?.seconds === timestampB?.seconds) {
       // If the seconds are equal, compare the nanoseconds
-      return timestampB.nanoseconds - timestampA.nanoseconds;
+      return timestampB?.nanoseconds - timestampA?.nanoseconds;
     } else {
       // Compare the seconds
-      return timestampB.seconds - timestampA.seconds;
+      return timestampB?.seconds - timestampA?.seconds;
     }
   });
 }
@@ -180,9 +180,13 @@ const featuredArticle = featured || sortedArticles[0];
         <Text
           fontSize={"sm"}
           fontWeight={"bold"}
+          color={'blue.500'}
+          textDecoration={'underline'}
+          cursor={'pointer'}
           onClick={() => setIsOpen(true)}
+          ml={20}
         >
-          Articles
+          create Article
         </Text>
         <CreateArticleForm isOpen={isOpen} onClose={onClose} articleUserId={user?.uid} />
         <Heading
