@@ -22,6 +22,7 @@ import PostLoader from "@/Components/Post/Loader";
 import Articles from "../articles/index";
 import { firestore } from "@/firebase/clientApp";
 import { getDocs, collection } from "firebase/firestore";
+import { motion } from "framer-motion";
 
 const PaginationBox = ({ articles, activeNumber, setActiveNumber }: any) => {
   const handleNext = () => {
@@ -89,7 +90,7 @@ const CardSwiper = ({ articles, activeNumber }: any) => {
   const cards = articles;
   const [isSmallScreen] = useMediaQuery("(max-width: 768px)");
 
-  console.log('isSmallScreen :', isSmallScreen);
+
 
 
   useEffect(() => {
@@ -120,6 +121,9 @@ const CardSwiper = ({ articles, activeNumber }: any) => {
    visibleCards = cards.slice(currentIndex, currentIndex + 2);
    }
 
+   const isPreviousButtonDisabled = currentIndex === 0;
+   const isNextButtonDisabled = currentIndex >= cards.length - (isSmallScreen ? 1 : 2);
+
   return (
     <>
       <Box
@@ -132,38 +136,48 @@ const CardSwiper = ({ articles, activeNumber }: any) => {
       >
         {/* Previous button */}
         <Button
-          display={'flex'}
-          justifyContent={'center'}
-          alignContent={'center'}
-          disabled={currentIndex === 0}
-          onClick={() => handleSwipe("right")}
-          variant="unstyled"
-          color="blue.500"
-          colorScheme="blue"
-          bg={'gray.200'}
-          borderRadius={'full'}
-          shadow={'md'}
-          mr={-30}
-        >
-          <BiLeftArrowAlt size={24} />
-        </Button>
+        display="flex"
+        justifyContent="center"
+        alignContent="center"
+        onClick={!isPreviousButtonDisabled ? () => handleSwipe("right") : undefined}
+        variant="unstyled"
+        color="blue.500"
+        colorScheme="blue"
+        bg={isPreviousButtonDisabled ? "gray.200" : "gray.100"}
+        borderRadius="full"
+        shadow="md"
+        mr={2}
+        zIndex={20}
+        opacity={isPreviousButtonDisabled ? 0.5 : 1}
+        cursor={isPreviousButtonDisabled ? "not-allowed" : "pointer"}
+        _hover={!isPreviousButtonDisabled ? { bg: "gray.100" } : undefined}
+      >
+        <BiLeftArrowAlt size={24} />
+      </Button>
         <Box
           display="flex"
           flexDirection={["column", "column", "row", "row"]}
           width="full"
+          transition="transform 0.3s ease-out"
+          gap={"2"}
         >
           {visibleCards.map((card: Article) => (
-            <Box
+            <motion.div
               key={card.id}
-              width={{ base: "100%", sm: "100%", md: "100%", lg: "100%" }}
-              height="412px"
-              bg="white"
-              border="1px solid #E2E8F0"
-              display="flex"
-              flexDirection="column"
-              justifyContent="space-between"
-              m={2}
-              borderRadius="md"
+              initial={{ opacity: 0, x: -20 }} // Initial animation values
+              animate={{ opacity: 1, y: 0 }} // Animation on card appearance
+              transition={{ duration: 0.5, delay: 0.2 }} // Transition duration and delay
+              style={{
+                width: "100%",
+                height: "412px",
+                background: "white",
+                border: "1px solid #E2E8F0",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between",
+                // margin: "2",
+                borderRadius: "md",
+              }}
             >
               <Image
                 src={card.imageURL}
@@ -220,26 +234,28 @@ const CardSwiper = ({ articles, activeNumber }: any) => {
                   </Link>
                 </Flex>
               </Box>
-            </Box>
+            </motion.div>
           ))}
         </Box>
         {/* Next button */}
         <Button
-          display={'flex'}
-          justifyContent={'center'}
-          alignContent={'center'}
-          disabled={currentIndex === cards.length - 2}
-          onClick={() => handleSwipe("left")}
-          variant="unstyled"
-          colorScheme="blue"
-          color="blue.500"
-          bg={'gray.200'}
-          borderRadius={'full'}
-          shadow={'md'}
-          ml={-30}
-        >
-          <BiRightArrowAlt size={24} />
-        </Button>
+        display="flex"
+        justifyContent="center"
+        alignContent="center"
+        onClick={!isNextButtonDisabled ? () => handleSwipe("left") : undefined}
+        variant="unstyled"
+        colorScheme="blue"
+        color="blue.500"
+        bg={isNextButtonDisabled ? "gray.200" : "gray.100"}
+        borderRadius="full"
+        shadow="md"
+        ml={-30}
+        opacity={isNextButtonDisabled ? 0.5 : 1}
+        cursor={isNextButtonDisabled ? "not-allowed" : "pointer"}
+        _hover={!isNextButtonDisabled ? { bg: "gray.100" } : undefined}
+      >
+        <BiRightArrowAlt size={24} />
+      </Button>
       </Box>
     </>
   );
