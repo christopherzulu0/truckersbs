@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { parse } from "date-fns";
-import { Box, Button, Flex, FormControl, FormLabel, Input, Select } from '@chakra-ui/react';
+import { Box, Button, Flex, FormControl, FormLabel, Input, Select, useMediaQuery } from '@chakra-ui/react';
 import { SearchIcon } from '@chakra-ui/icons';
 import { Article } from '@/pages/archives';
 import { useState } from "react";
@@ -10,18 +10,21 @@ import { CollectionReference, DocumentData, Query, collection, endAt, getDocs, g
 interface ArticleFilterProps {
    articles: Article[];
     setArticles: React.Dispatch<React.SetStateAction<Article[]>>
+    setIsOpen: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 
-const ArticleFilter = ({ articles, setArticles }: ArticleFilterProps) => {
+const ArticleFilter = ({ articles, setArticles, setIsOpen }: ArticleFilterProps) => {
   const [searchText, setSearchText] = useState("");
   const [selectedYear, setSelectedYear] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedReads, setSelectedReads] = useState("");
-  
+  const [isBigScreen] = useMediaQuery("(min-width: 768px)");
 
   useEffect(() => {
-    handleFilter();
+    if(isBigScreen) {
+      handleFilter();
+    }
   }, [searchText, selectedYear, selectedCategory, selectedReads]);
 
   const handleFilter = async () => {
@@ -91,6 +94,11 @@ const ArticleFilter = ({ articles, setArticles }: ArticleFilterProps) => {
     setArticles(filteredArticles);
   };
 
+  const handleCallFilter = () => {
+    setIsOpen(false);
+    handleFilter();
+  };
+
   const handleReset = () => {
     setSearchText("");
     setSelectedYear("");
@@ -110,7 +118,7 @@ const ArticleFilter = ({ articles, setArticles }: ArticleFilterProps) => {
       gap={"2"}
       marginTop="180px"
       // marginLeft={{base: '0', sm: '0', md: '20', lg: '28'}}
-      height="420px"
+      height="440px"
       mb={4}
       boxShadow={"md"}
       display={"flex"}
@@ -131,7 +139,7 @@ const ArticleFilter = ({ articles, setArticles }: ArticleFilterProps) => {
               onChange={(e) => setSearchText(e.target.value)}
             />
             <Box position="absolute" right="1rem" top="50%" transform="translateY(-50%)">
-              <SearchIcon color="gray.400" />
+              <SearchIcon color="gray.400" onClick={handleCallFilter}/>
             </Box>
           </Flex>
         </FormControl>
@@ -187,6 +195,7 @@ const ArticleFilter = ({ articles, setArticles }: ArticleFilterProps) => {
           </Select>
         </FormControl>
       </Flex>
+      {!isBigScreen && <Button onClick={handleCallFilter}>Filter</Button>}
       <Button onClick={handleReset}>Reset</Button>
     </Box>
     </>

@@ -74,7 +74,7 @@ const PaginationBox = ({ articles, activeNumber, setActiveNumber }: any) => {
 
 export interface Article {
   featured: unknown;
-  id: number;
+  id: string;
   title: string;
   imageURL: string;
   description: string;
@@ -244,6 +244,7 @@ const CardSwiper = ({ articles, activeNumber }: any) => {
     </>
   );
 };
+
 
 const Archives = () => {
   const [articles, setArticles] = useState<Article[]>([]);
@@ -503,7 +504,7 @@ const Archives = () => {
                   flexDirection={"column"}
                 >
                   <Heading as="h2" size="md" textAlign={"center"}>
-                    No articles found
+                    No articles found in the search category
                   </Heading>
                   <Text fontSize={"sm"} textAlign={
                     "center"
@@ -528,13 +529,13 @@ const Archives = () => {
             </Box> */}
           </Box>
           <Box display={{ base: "none", sm: "none", md: "flex", lg: "flex" }}>
-            <ArticleFilter articles={articles} setArticles={setArticles} />
+            <ArticleFilter articles={articles} setArticles={setArticles} setIsOpen={setIsOpen}/>
           </Box>
         </Box>
       </Container>
 
       <ReusableModal isOpen={isOpen} setIsOpen={setIsOpen}>
-        <ArticleFilter articles={articles} setArticles={setArticles} />
+        <ArticleFilter articles={articles} setArticles={setArticles} setIsOpen={setIsOpen}/>
       </ReusableModal>
       <Footer />
     </>
