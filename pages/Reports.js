@@ -21,6 +21,11 @@ import {
   WrapItem,
   useDisclosure,
   Spinner,
+  Tab,
+  TabPanel,
+  TabPanels,
+  TabList,
+  Tabs,
 } from "@chakra-ui/react";
 
 // custom components
@@ -29,6 +34,7 @@ import FormTriggerBtn from "../Components/Modal/FormModal/RoadReports.jsx";
 import DriverTriggerReport from "../Components/Modal/FormModal/ReportDriver.js";
 import ModalWrapper from "../Components/Modal/ModalWrapper.tsx";
 
+import DriverReports from "../Components/driverReports";
 import Footer from "../Components/Footer";
 
 // create a loading indicator
@@ -117,24 +123,42 @@ export default function Report() {
           </VStack>
         </Box>
       </Flex>{" "}
-      {isLoading && <LoadingWidget />}
-      <Wrap mx={{ base: "auto", md: "80px" }} p={{ base: "0", md: "32px" }}>
-        {reports.map((report, idx) => {
-          return (
-            <WrapItem key={idx}>
-              <ReportCard
-                heading={report.caption}
-                imageSrc={report.attachment}
-                date={report.date}
-                time={report.timeNow}
-                location={report.location}
-                href={"#"}
-                description={report.description}
-              />
-            </WrapItem>
-          );
-        })}
-      </Wrap>
+      {/* tabs */}
+      <Tabs>
+        <TabList>
+          <Tab>Road Reports </Tab>
+          <Tab>Reported Drivers</Tab>
+        </TabList>
+
+        <TabPanels>
+          <TabPanel>
+            {isLoading && <LoadingWidget />}
+            <Wrap
+              mx={{ base: "auto", md: "80px" }}
+              p={{ base: "0", md: "32px" }}
+            >
+              {reports.map((report, idx) => {
+                return (
+                  <WrapItem key={idx}>
+                    <ReportCard
+                      heading={report.caption}
+                      imageSrc={report.attachment}
+                      date={report.date}
+                      time={report.timeNow}
+                      location={report.location}
+                      href={"#"}
+                      description={report.description}
+                    />
+                  </WrapItem>
+                );
+              })}
+            </Wrap>
+          </TabPanel>
+          <TabPanel>
+            <DriverReports></DriverReports>
+          </TabPanel>
+        </TabPanels>
+      </Tabs>
       <Footer />
     </>
   );

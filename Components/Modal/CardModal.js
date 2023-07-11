@@ -70,8 +70,6 @@ function CardModal({ imageSrc, heading, description, time, location }) {
                     size="md"
                     style={{ marginTop: "35px" }}
                   ></Heading>
-
-                  <br />
                 </Box>
               </Stack>
             </VStack>
