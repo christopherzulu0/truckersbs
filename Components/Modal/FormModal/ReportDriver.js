@@ -133,7 +133,6 @@ export default function FormTriggerBtn({ getReports }) {
       });
 
       console.log("Document created with ID:", docRef.id);
-      
     } catch (error) {
       console.error("Error creating document:", error);
     } finally {

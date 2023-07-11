@@ -34,7 +34,6 @@ import FormTriggerBtn from "../Components/Modal/FormModal/RoadReports.jsx";
 import DriverTriggerReport from "../Components/Modal/FormModal/ReportDriver.js";
 import ModalWrapper from "../Components/Modal/ModalWrapper.tsx";
 
-import DriverReports from "../Components/driverReports";
 import Footer from "../Components/Footer";
 
 // create a loading indicator
@@ -57,18 +56,26 @@ export default function Report() {
   const [reports, setReports] = useState([]);
   const [downloadURL, setDownloadURL] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState(0);
 
-  const getAllreports = async (limit) => {
+  const getAllreports = async () => {
     try {
       setIsLoading(!isLoading);
-      console.log(reports.length);
       const db = getFirestore();
-      const querySnapshot = await getDocs(collection(db, "report"));
-
       const allReports = [];
-      querySnapshot.forEach((doc) => {
-        allReports.push({ id: doc.id, ...doc.data() });
-      });
+      if (activeTab == 0) {
+        const querySnapshot = await getDocs(collection(db, "report"));
+
+        querySnapshot.forEach((doc) => {
+          allReports.push({ id: doc.id, ...doc.data() });
+        });
+      } else {
+        const querySnapshot = await getDocs(collection(db, "report_drivers"));
+
+        querySnapshot.forEach((doc) => {
+          allReports.push({ id: doc.id, ...doc.data() });
+        });
+      }
 
       setReports(allReports);
       if (allReports.length == 0) {
@@ -89,6 +96,23 @@ export default function Report() {
       setIsLoading(!isLoading);
     }
   }, [reports]);
+
+  useEffect(() => {
+    getAllreports();
+    setReports([]);
+    setIsLoading(!isLoading);
+
+    if (reports.length > 0) {
+      setIsLoading(!isLoading);
+    }
+  }, [activeTab]);
+
+  const handleTabChange = (tabIndex) => {
+    setActiveTab(tabIndex);
+    if (tabIndex == 0) {
+      console.log(tabIndex);
+    }
+  };
 
   return (
     <>
@@ -124,8 +148,8 @@ export default function Report() {
         </Box>
       </Flex>{" "}
       {/* tabs */}
-      <Tabs>
-        <TabList>
+      <Tabs onChange={handleTabChange}>
+        <TabList justifyContent="center">
           <Tab>Road Reports </Tab>
           <Tab>Reported Drivers</Tab>
         </TabList>
@@ -155,7 +179,28 @@ export default function Report() {
             </Wrap>
           </TabPanel>
           <TabPanel>
-            <DriverReports></DriverReports>
+            {isLoading && <LoadingWidget />}
+            <Wrap
+              mx={{ base: "auto", md: "80px" }}
+              p={{ base: "0", md: "32px" }}
+            >
+              {reports.map((report, idx) => {
+                return (
+                  <WrapItem key={idx}>
+                    <ReportCard
+                      heading={report.caption}
+                      imageSrc={report.attachment}
+                      date={report.date}
+                      time={report.timeNow}
+                      location={report.location}
+                      href={"#"}
+                      description={report.description}
+                      companyName={report.companyName}
+                    />
+                  </WrapItem>
+                );
+              })}
+            </Wrap>
           </TabPanel>
         </TabPanels>
       </Tabs>
