@@ -1,5 +1,5 @@
 
-  # locofy-react-nextjs-project
+  #Driver-profile page
 
   Note: Please ensure you have installed <code><a href="https://nodejs.org/en/download/">nodejs</a></code>
 
@@ -7,4 +7,5 @@
   1) Open project folder in <a href="https://code.visualstudio.com/download">Visual Studio Code</a>
   2) In the terminal, run `npm install`
   3) Run `npm run dev` to view project in browser
+  4) navigate to the page using localhost:3000/dashboard
   
