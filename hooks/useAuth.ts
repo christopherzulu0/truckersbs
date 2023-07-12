@@ -6,6 +6,7 @@ import { userState } from "../atoms/userAtom";
 import { auth, firestore } from "../firebase/clientApp";
 import nookies from "nookies";
 import { User } from "firebase/auth";
+import getUserRole from "@/custom/getUserRole";
 
 const useAuth = () => {
   const [user] = useAuthState(auth);
@@ -15,6 +16,9 @@ const useAuth = () => {
     console.log("HERE IS USER", user);
 
     user ? setUserCookie(user) : nookies.set(undefined, "token", "");
+    if (user) {
+      console.log(getUserRole(user));
+    }
   }, [user]);
 
   const setUserCookie = async (user: User) => {
