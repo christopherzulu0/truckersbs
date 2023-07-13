@@ -26,13 +26,16 @@ import {
   TabPanels,
   TabList,
   Tabs,
+  TabIndicator,
 } from "@chakra-ui/react";
 
+import Link from "next/link";
 // custom components
 
 import FormTriggerBtn from "../Components/Modal/FormModal/RoadReports.jsx";
 import DriverTriggerReport from "../Components/Modal/FormModal/ReportDriver.js";
 import ModalWrapper from "../Components/Modal/ModalWrapper.tsx";
+import SearchReports from "../Components/SearchReports.jsx";
 
 import Footer from "../Components/Footer";
 
@@ -63,6 +66,7 @@ export default function Report() {
       setIsLoading(!isLoading);
       const db = getFirestore();
       const allReports = [];
+      const tabs = []
       if (activeTab == 0) {
         const querySnapshot = await getDocs(collection(db, "report"));
 
@@ -148,20 +152,30 @@ export default function Report() {
         </Box>
       </Flex>{" "}
       {/* tabs */}
-      <Tabs onChange={handleTabChange}>
+      <Box>
+        <SearchReports />
+      </Box>
+      <Tabs variant="unstyled" position="relative" onChange={handleTabChange}>
         <TabList justifyContent="center">
           <Tab>Road Reports </Tab>
           <Tab>Reported Drivers</Tab>
         </TabList>
+        <TabIndicator
+          mt="-1.5px"
+          height="2px"
+          bg="blue.500"
+          borderRadius="1px"
+        />
 
         <TabPanels>
           <TabPanel>
-            {isLoading && <LoadingWidget />}
+          
             <Wrap
               mx={{ base: "auto", md: "80px" }}
               p={{ base: "0", md: "32px" }}
             >
               {reports.map((report, idx) => {
+                console.log(report);
                 return (
                   <WrapItem key={idx}>
                     <ReportCard
@@ -171,6 +185,7 @@ export default function Report() {
                       time={report.timeNow}
                       location={report.location}
                       href={"#"}
+                      id={report.id}
                       description={report.description}
                     />
                   </WrapItem>
@@ -194,6 +209,7 @@ export default function Report() {
                       time={report.timeNow}
                       location={report.location}
                       href={"#"}
+                      id={report.id}
                       description={report.description}
                       companyName={report.companyName}
                     />

@@ -1,12 +1,21 @@
 import ModalWrapper from "../ModalWrapper";
 import { useState, useEffect } from "react";
 import { LoadingWidget } from "../../../pages/Reports.js";
-import { getFirestore, collection, addDoc } from "firebase/firestore";
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  doc,
+  setDoc,
+} from "firebase/firestore";
 import { getStorage, getDownloadURL, ref, uploadBytes } from "firebase/storage";
 
 //for google maps real location
 import { LoadScript, Marker, GoogleMap } from "@react-google-maps/api";
 
+import { auth } from "../../../firebase/clientApp.ts";
+
+import { useAuthState } from "react-firebase-hooks/auth";
 import {
   Box,
   Flex,
@@ -93,10 +102,14 @@ export default function FormTriggerBtn({ getReports }) {
     setTime((time) => ({ ...time, ...timeObj }));
   };
 
-  // automatically set the time
+  
+  const [user] = useAuthState(auth);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const [createdBy] = user.providerData;
+    console.log("createdBy: ", createdBy);
 
     // Process the form data here
 
@@ -126,6 +139,7 @@ export default function FormTriggerBtn({ getReports }) {
         dateTime: time.dateTime,
         date: time.date,
         description,
+        createdBy,
       });
 
       console.log("Document created with ID:", docRef.id);
@@ -192,7 +206,7 @@ export default function FormTriggerBtn({ getReports }) {
                   />
                 </FormControl>
                 <FormControl mb={4}>
-                  <FormLabel>Caption</FormLabel>
+                  <FormLabel>Title</FormLabel>
 
                   <Input
                     value={caption}

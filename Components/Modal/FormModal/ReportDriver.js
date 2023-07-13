@@ -3,7 +3,10 @@ import { useState } from "react";
 
 import { getFirestore, collection, addDoc } from "firebase/firestore";
 import { getStorage, getDownloadURL, ref, uploadBytes } from "firebase/storage";
+// /firebase/clientApp
+import { auth } from "../../../firebase/clientApp.ts";
 
+import { useAuthState } from "react-firebase-hooks/auth";
 //for google maps real location
 import { LoadScript, Marker, GoogleMap } from "@react-google-maps/api";
 
@@ -91,30 +94,18 @@ export default function FormTriggerBtn({ getReports }) {
     setTime((time) => ({ ...time, ...timeObj }));
   };
 
-  // pic the
-
-  // automatically set the time
+  const [user] = useAuthState(auth);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    console.log("Company Name:", companyName);
-    console.log("Location:", location);
-
-    console.log("Description:", description);
-    console.log("Image:", image);
-    console.log("driver descrption", driverDescription);
-
-    console.log("Driver Name:", driverName);
-
-    console.log("Plate number:", plateNumber);
+    const [createdBy] = user.providerData;
 
     try {
       // Upload image to Firebase Storage
       const storageRef = ref(getStorage(), "ReportImages/" + image.name);
       const uploadRslt = await uploadBytes(storageRef, image);
       const downloadUrl = await getDownloadURL(uploadRslt.ref);
-      console.log(downloadUrl);
 
       // Create document in Firestore
       const db = getFirestore();
@@ -130,6 +121,7 @@ export default function FormTriggerBtn({ getReports }) {
         driverName,
         plateNumber,
         description,
+        createdBy,
       });
 
       console.log("Document created with ID:", docRef.id);
@@ -180,7 +172,7 @@ export default function FormTriggerBtn({ getReports }) {
                 />
               </FormControl>
               <FormControl mb={4}>
-                <FormLabel>Caption</FormLabel>
+                <FormLabel>Title</FormLabel>
                 <Input
                   value={caption}
                   onChange={(e) => setCaption(e.target.value)}

@@ -1,5 +1,8 @@
 import CardModal from "./Modal/CardModal";
-
+import { GrLocation } from "react-icons/gr";
+import { CiLocationOn } from "react-icons/ci";
+import { AiOutlineArrowRight } from "react-icons/ai";
+import { useState } from "react";
 import {
   Box,
   Stack,
@@ -7,10 +10,35 @@ import {
   Flex,
   Heading,
   Text,
+  Button,
   HStack,
 } from "@chakra-ui/react";
 
-const Card = ({ heading, time, description, location, imageSrc, href }) => {
+import Link from "next/link";
+
+const Card = ({
+  heading,
+  date,
+  time,
+  description,
+  location,
+  imageSrc,
+  href,
+  id,
+}) => {
+  const [timeOfDay, setTimeOfDay] = useState("AM");
+
+  const formattedDate = date.replaceAll("-", "/");
+
+  const timeString = time;
+
+  const timer = new Date(`2000-01-01T${timeString}`);
+  const formattedTime = timer.toLocaleTimeString([], {
+    hour: "numeric",
+    minute: "2-digit",
+  });
+
+  const town = location.split(/[,]/)[1].split(/[\d]/)[0];
   return (
     <Box
       w={{ md: "lg" }}
@@ -37,23 +65,32 @@ const Card = ({ heading, time, description, location, imageSrc, href }) => {
           <HStack
             fontSize="16px"
             fontWeight="400"
-            color="#5F6D7E"
+            color="#8CBC8B"
             lineHeight="10"
           >
-            <Text>{location}:</Text>
-            <Text>{time}:</Text>
+            <Text color="#8CBC8B">
+              <CiLocationOn />
+            </Text>
+            <Text>{town + " "} :</Text> <Text>{formattedDate + " "}:</Text>
+            <Text> {" " + formattedTime}</Text>
           </HStack>
 
           <br />
         </Box>
 
-        <CardModal
-          imageSrc={imageSrc}
-          heading={heading}
-          description={description}
-          time={time}
-          location={location}
-        ></CardModal>
+        <Button
+          // onClick={onOpen}
+          variant={"link"}
+          colorScheme={"blue"}
+          size={"sm"}
+        >
+          <Link href={`/ReportDetails/${id}`}>
+            <HStack>
+              <Text>Read More</Text>
+              <AiOutlineArrowRight style={{ marginLeft: "5px" }} />
+            </HStack>
+          </Link>
+        </Button>
       </Stack>
     </Box>
   );
