@@ -336,6 +336,7 @@ const Signup = (props: Props) => {
                 type="password"
                 id="password"
                 placeholder="Enter your password"
+                minLength={6}
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
               />
@@ -348,9 +349,10 @@ const Signup = (props: Props) => {
                 id="confirmPassword"
                 placeholder="Confirm your password"
                 value={confirmPassword}
+                minLength={6}
                 onChange={(event) => setConfirmPassword(event.target.value)}
               />
-              {passwordError && <FormErrorMessage>Passwords do not match</FormErrorMessage>}
+              {passwordError && <FormErrorMessage>Passwords do not match or less than 6 characters</FormErrorMessage>}
             </FormControl>
           </ModalBody>
           <ModalFooter>
