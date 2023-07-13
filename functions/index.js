@@ -21,12 +21,12 @@ admin.initializeApp();
 //   response.send("Hello from Firebase!");
 // });
 
-
-exports.createUserAndAddUserRole = onCall(async (req) => {
-  const email = req.data.email;
-  const password = req.data.password;
-  const role = req.data.role;
-
+exports.createUserAndAddUserRole = onCall(async (
+    {data: {
+      email,
+      password,
+      role,
+    }}) => {
   const userRecord = await admin
       .auth()
       .createUser({

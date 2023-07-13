@@ -1,13 +1,110 @@
-import React from "react";
+import React, { useState } from "react";
 import Footer from "@/Components/Footer";
-import { Container, Input, Stack, Button, Box, Image, FormLabel } from '@chakra-ui/react'
-
-
-
+import {
+  Container,
+  Input,
+  Stack,
+  Button,
+  Box,
+  Image,
+  FormLabel,
+  Select,
+  Modal,
+  ModalBody,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  FormControl,
+  ModalFooter,
+  FormErrorMessage,
+} from '@chakra-ui/react'
+import { useSignInWithEmailAndPassword } from "react-firebase-hooks/auth";
+import { useRouter } from "next/router";
+import { functions, auth, httpsCallable } from "@/firebase/clientApp";
+import getUserRole from "@/custom/getUserRole";
 
 type Props = {}
 
 const Signup = (props: Props) => {
+
+  const [signInWithEmailAndPassword, _, loading, authError] = useSignInWithEmailAndPassword(auth);
+  const router = useRouter();
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [role, setRole] = useState("")
+  const [location, setLocation] = useState("");
+  const [transmission, setTransmission] = useState("");
+  const [trailers, setTrailers] = useState("");
+  const [drivingExperience, setDrivingExperience] = useState("");
+  const [mountainExperience, setMountainExperience] = useState("");
+  const [offroadExperience, setOffroadExperience] = useState("");
+  const [iceRoadExperience, setIceRoadExperience] = useState("");
+  const [cv, setCv] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [passwordError, setPasswordError] = useState(false);
+
+
+
+  const onSubmit = async () => {
+    try {
+      // Call the Firebase Cloud Function for user registration
+      const createUserWithRole = httpsCallable(functions, "createUserAndAddUserRole"); // Use the `httpsCallable` function from `functions`
+
+      const response: any = await createUserWithRole({
+        email: email,
+        password: password,
+        role: role,
+      });
+
+      // If user Sign Up is succcessful, Log user in with credentials in state.
+      if (response?.data?.status && response?.data.status === 200) {
+
+
+        const loginResponse = await signInWithEmailAndPassword(email, password);
+        router.push("/")
+        if (loginResponse) {
+          console.log("Login Response", loginResponse);
+          console.log("user role:", await getUserRole(loginResponse.user))
+        }
+        else {
+          console.log("Error Somewhere");
+        }
+      }
+
+    } catch (error) {
+      // Handle any errors that occur during registration
+      console.error("Error registering user:", error);
+    }
+  };
+
+  const handleSignUpClick = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+  };
+
+  const handlePasswordSubmit = async (e: any) => {
+    e.preventDefault();
+    if (password === confirmPassword) {
+      setPasswordError(false);
+      await onSubmit();
+    } else {
+      setPasswordError(true);
+    }
+  };
+
+  const handleRoleChange = (event: any) => {
+    setRole(event.target.value);
+  };
+
+  const handleTransmissionChange = (event: any) => {
+    setTransmission(event.target.value);
+  };
+
   return (
     <Container maxW="100%" justifyContent="flex-start" p={0} pt="10" position="relative" >
       <Box
@@ -60,43 +157,210 @@ const Signup = (props: Props) => {
       >
         <Stack spacing={1}>
 
-          <FormLabel htmlFor="name" color="black">Name</FormLabel>
-          <Input bg="white" id="name" placeholder='Mark Johnston' size='md' />
+          {/* Name */}
+          <FormLabel htmlFor="name" color="black">
+            Name
+          </FormLabel>
+          <Input
+            bg="white"
+            id="name"
+            placeholder="Mark Johnston"
+            size="md"
+            value={name}
+            onChange={(event) => setName(event.target.value)}
+            required
+          />
 
+          {/* Email */}
           <FormLabel htmlFor="email">Email</FormLabel>
-          <Input bg="white" id="email" placeholder='example@example.com' size='md' />
+          <Input
+            bg="white"
+            id="email"
+            placeholder="example@example.com"
+            size="md"
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+            required
+          />
 
-          <FormLabel htmlFor="location" color="black">Location</FormLabel>
-          <Input bg="white" id="location" placeholder='Lake road 123 Street' size='md' />
+          {/* Location */}
+          <FormLabel htmlFor="location" color="black">
+            Location
+          </FormLabel>
+          <Input
+            bg="white"
+            id="location"
+            placeholder="Lake road 123 Street"
+            size="md"
+            value={location}
+            onChange={(event) => setLocation(event.target.value)}
+            required
+          />
 
-          <FormLabel htmlFor="transmission" color="black">Transmission</FormLabel>
-          <Input bg="white" placeholder='Automatic' size='md' />
+          {/* Transmission */}
+          <FormControl>
+            <FormLabel htmlFor="role" color="black">
+              Transmission
+            </FormLabel>
+            <Select
+              bg="white"
+              id="role"
+              placeholder="Select Role"
+              size="md"
+              value={role}
+              onChange={handleTransmissionChange}
+              required
+            >
+              <option value="automatic">Automatic</option>
+              <option value="manua">Manual</option>
+            </Select>
+          </FormControl>
 
-          <FormLabel htmlFor="name" color="black">Trailers</FormLabel>
-          <Input bg="white" placeholder='Trailers' size='md' />
+          {/* Trailers */}
+          <FormLabel htmlFor="trailers" color="black">
+            Trailers
+          </FormLabel>
+          <Input
+            bg="white"
+            placeholder="Trailers"
+            size="md"
+            value={trailers}
+            onChange={(event) => setTrailers(event.target.value)}
+            required
+          />
 
-          <FormLabel htmlFor="name" color="black">Name</FormLabel>
-          <Input bg="white" placeholder='Driving Experience' size='md' />
+          {/* Driving Experience */}
+          <FormLabel htmlFor="drivingExperience" color="black">
+            Driving Experience
+          </FormLabel>
+          <Input
+            bg="white"
+            placeholder="Driving Experience"
+            size="md"
+            value={drivingExperience}
+            onChange={(event) => setDrivingExperience(event.target.value)}
+            required
+          />
 
-          <FormLabel htmlFor="mtExp" color="black">Mountain Experience</FormLabel>
-          <Input bg="white" id="mtExp" placeholder='4' size='md' />
+          {/* Mountain Experience */}
+          <FormLabel htmlFor="mountainExperience" color="black">
+            Mountain Experience
+          </FormLabel>
+          <Input
+            bg="white"
+            id="mountainExperience"
+            placeholder="4"
+            size="md"
+            value={mountainExperience}
+            onChange={(event) => setMountainExperience(event.target.value)}
+            required
+          />
 
-          <FormLabel htmlFor="offExp" color="black">Offroad Experience</FormLabel>
-          <Input bg="white" id="offExp" placeholder='6' size='md' />
+          {/* Offroad Experience */}
+          <FormLabel htmlFor="offroadExperience" color="black">
+            Offroad Experience
+          </FormLabel>
+          <Input
+            bg="white"
+            id="offroadExperience"
+            placeholder="6"
+            size="md"
+            value={offroadExperience}
+            onChange={(event) => setOffroadExperience(event.target.value)}
+            required
+          />
 
-          <FormLabel htmlFor="iceExp" color="black">Ice Road Experience</FormLabel>
-          <Input bg="white" id="iceExp" placeholder='5' size='md' />
+          {/* Ice Road Experience */}
+          <FormLabel htmlFor="iceRoadExperience" color="black">
+            Ice Road Experience
+          </FormLabel>
+          <Input
+            bg="white"
+            id="iceRoadExperience"
+            placeholder="5"
+            size="md"
+            value={iceRoadExperience}
+            onChange={(event) => setIceRoadExperience(event.target.value)}
+            required
+          />
 
-          <FormLabel htmlFor="cv" color="black">CV</FormLabel>
-          <Input bg="white" id="cv" placeholder='CV' size='md' />
+          {/* CV */}
+          <FormLabel htmlFor="cv" color="black">
+            CV
+          </FormLabel>
+          <Input
+            bg="white"
+            id="cv"
+            placeholder="CV"
+            size="md"
+            value={cv}
+            onChange={(event) => setCv(event.target.value)}
+            required
+          />
+          {/* Role */}
+          <FormControl>
+            <FormLabel htmlFor="role" color="black">
+              Role
+            </FormLabel>
+            <Select
+              bg="white"
+              id="role"
+              placeholder="Select Role"
+              size="md"
+              value={role}
+              onChange={handleRoleChange}
+              required
+            >
+              <option value="18wheeler">18 Wheeler</option>
+              <option value="4wheeler">4 Wheeler</option>
+              <option value="carrier">Carrier</option>
+            </Select>
+          </FormControl>
         </Stack>
       </Container>
       <Container maxW="md" mb={10} margin={0} padding={0} flex={1} justifyContent="center" >
-        <Button bg='white' color="black" size='md' >
+        {/* Sign Up Button */}
+        <Button ml={10} mt="10" w={"full"} type="submit" colorScheme="blue" color="white" size="lg" onClick={handleSignUpClick}>
           Sign Up
         </Button>
       </Container>
+      {/* Password Modal */}
+      <Modal isOpen={isModalOpen} onClose={handleModalClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Set Up Account Password</ModalHeader>
+          <ModalBody>
+            <FormControl isInvalid={passwordError}>
+              <FormLabel htmlFor="password">Password</FormLabel>
+              <Input
+                type="password"
+                id="password"
+                placeholder="Enter your password"
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+              />
+            </FormControl>
 
+            <FormControl isInvalid={passwordError}>
+              <FormLabel htmlFor="confirmPassword">Confirm Password</FormLabel>
+              <Input
+                type="password"
+                id="confirmPassword"
+                placeholder="Confirm your password"
+                value={confirmPassword}
+                onChange={(event) => setConfirmPassword(event.target.value)}
+              />
+              {passwordError && <FormErrorMessage>Passwords do not match</FormErrorMessage>}
+            </FormControl>
+          </ModalBody>
+          <ModalFooter>
+            <Button colorScheme="blue" mr={3} onClick={handlePasswordSubmit}>
+              Submit
+            </Button>
+            <Button onClick={handleModalClose}>Cancel</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
       <Footer />
     </Container>
   )
