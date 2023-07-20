@@ -2,6 +2,7 @@ import { Grid, GridItem, Box, Heading, Image } from "@chakra-ui/react";
 
 const BlogPost = ({ title, thumbnail }) => {
   return (
+    <Box>
     <Grid templateColumns="50px auto" my="10px" gap={4} alignItems="center">
       <GridItem>
         <Box w="50px" h="50px" bg="gray.200" borderRadius="md">
@@ -13,8 +14,11 @@ const BlogPost = ({ title, thumbnail }) => {
         <Heading as="h3" size="md">
           {title}
         </Heading>
+    
       </GridItem>
     </Grid>
+    <hr />
+    </Box>
   );
 };
 

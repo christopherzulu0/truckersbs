@@ -17,23 +17,57 @@ import {
   TabPanels,
   Tabs,
 } from "@chakra-ui/react";
-import React, { useState } from "react";
+
+import {
+  doc,
+  getDoc,
+  getFirestore,
+  query,
+  collection,
+  limit,
+  getDocs,
+  where,
+} from "firebase/firestore";
+import React, { useState, useEffect } from "react";
 import { AiOutlineSearch } from "react-icons/ai";
 // import { format } from "date-fns";
 
-const SearchPage = () => {
+const SearchPage = ({ setReports }) => {
+  let db = getFirestore();
   const [location, setLocation] = useState("");
   const [time, setTime] = useState("");
   const [date, setDate] = useState("");
-  const [category, setCategory] = useState("");
+  const [title, setTitle] = useState("");
   const [inputType, setInputType] = useState("text");
   const [searchTerm, setSearchTerm] = useState("");
   const handleSearch = () => {
+    console.log(date, time, title, location, searchTerm);
     // Perform the search based on the selected filters
+    fetchReports(title);
   };
 
-  const handleInputToggle = () => {
-    setInputType(inputType === "text" ? "password" : "text");
+  const fetchReports = async (title) => {
+    try {
+      const q = query(
+        collection(db, "report"),
+        where("caption", "<=", searchTerm)
+        // where("date", "==", date),
+        // where("timeNow", "==", time),
+        // where("location", "==", location),
+        // where("caption", "<=", title)
+      );
+      let tempArray = [];
+      const querySnapshot = await getDocs(q);
+      querySnapshot.forEach((doc) => {
+        tempArray.push({ id: doc.id, ...doc.data() });
+        setReports(tempArray);
+        console.log(doc.data());
+      });
+
+      // setRelatedReports(tempArray);
+    } catch (error) {
+      console.error("Error fetching related posts:", error);
+    }
   };
 
   return (
@@ -47,65 +81,12 @@ const SearchPage = () => {
           // backgroundColor: "",
           margin: "2% auto",
           padding: "14px",
+          paddingLeft: "20px",
+          paddingRight: "20px",
           borderRadius: "30px 30px",
         }}
       >
         <>
-          {/* <Box p={4}>
-            <Grid templateColumns="repeat(2, 1fr)" gap={4}>
-              <GridItem>
-                <FormControl>
-                  <FormLabel>Location</FormLabel>
-                  <Input
-                    value={location}
-                    onChange={(e) => setLocation(e.target.value)}
-                    placeholder="Enter location"
-                  />
-                </FormControl>
-              </GridItem>
-              <GridItem>
-                <FormControl>
-                  <FormLabel>Time</FormLabel>
-                  <Input
-                    value={time}
-                    onChange={(e) => setTime(e.target.value)}
-                    placeholder="Enter time"
-                  />
-                </FormControl>
-              </GridItem>
-              <GridItem>
-                <FormControl>
-                  <FormLabel>Date</FormLabel>
-                  <Input
-                    type="date"
-                    value={date}
-                    onChange={(e) => setDate(e.target.value)}
-                    placeholder="Select date"
-                  />
-                </FormControl>
-              </GridItem>
-              <GridItem>
-                <FormControl>
-                  <FormLabel>Category</FormLabel>
-                  <Select
-                    value={category}
-                    onChange={(e) => setCategory(e.target.value)}
-                    placeholder="Select category"
-                  >
-                  <option value="category1">Category 1</option>
-                  <option value="category2">Category 2</option>
-                  <option value="category3">Category 3</option>
-                  </Select>
-                  </FormControl>
-                  </GridItem>
-                  <GridItem colSpan={2}>
-                  <Button onClick={handleSearch} colorScheme="blue">
-                  Search
-                  </Button>
-                  </GridItem>
-                  </Grid>
-                </Box> */}
-
           <InputGroup border="none">
             <FormControl maxW="120px">
               {/* <FormLabel>Date</FormLabel> */}
@@ -113,29 +94,24 @@ const SearchPage = () => {
                 outline="none"
                 border="none"
                 type={inputType}
-                value={"time"}
-                onClick={(e) => handleInputToggle()}
-                // onChange={(e) => setDate(e.target.value)}
-                placeholder="Select date"
+                value={time}
+                // onClick={(e) => handleInputToggle()}
+                onChange={(e) => setTime(e.target.value)}
+                placeholder="time"
               />
             </FormControl>
 
             <FormControl maxW="120px">
-              {/* <FormLabel>Category</FormLabel> */}
-              <Select
+              <Input
+                type={inputType}
+                value={title}
                 border="none"
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                placeholder="Categories"
-              >
-                <option value="category1">location 1</option>
-                <option value="category2">Category 2</option>
-                <option value="category3">Category 3</option>
-              </Select>
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="Title"
+              />
             </FormControl>
 
             <FormControl maxW="120px">
-              {/* <FormLabel>Date</FormLabel> */}
               <Input
                 type={inputType}
                 value={date}
@@ -145,17 +121,13 @@ const SearchPage = () => {
               />
             </FormControl>
             <FormControl maxW="120px" border="none">
-              {/* <FormLabel>Category</FormLabel> */}
-              <Select
-                value={category}
+              <Input
+                type={inputType}
+                value={location}
                 border="none"
-                onChange={(e) => setCategory(e.target.value)}
+                onChange={(e) => setLocation(e.target.value)}
                 placeholder="location"
-              >
-                <option value="category1">Category 1</option>
-                <option value="category2">Category 2</option>
-                <option value="category3">Category 3</option>
-              </Select>
+              />
             </FormControl>
             <Input
               type="text"

@@ -69,7 +69,6 @@ export default function FormTriggerBtn({ getReports }) {
         const { results } = data;
         if (results && results.length > 0) {
           const { formatted_address } = results[0];
-          // const { location } = geometry;
           console.log(formatted_address);
           setLocation(formatted_address);
           setMapCoordinates(location);
@@ -102,14 +101,13 @@ export default function FormTriggerBtn({ getReports }) {
     setTime((time) => ({ ...time, ...timeObj }));
   };
 
-  
   const [user] = useAuthState(auth);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     const [createdBy] = user.providerData;
-    console.log("createdBy: ", createdBy);
+    
 
     // Process the form data here
 

@@ -66,7 +66,7 @@ export default function Report() {
       setIsLoading(!isLoading);
       const db = getFirestore();
       const allReports = [];
-      const tabs = []
+      const tabs = [];
       if (activeTab == 0) {
         const querySnapshot = await getDocs(collection(db, "report"));
 
@@ -82,9 +82,7 @@ export default function Report() {
       }
 
       setReports(allReports);
-      if (allReports.length == 0) {
-        setIsLoading(false);
-      }
+
       console.log("All reports:", allReports, "isLoading:", isLoading);
     } catch (error) {
       console.error("Error retrieving reports:", error);
@@ -97,7 +95,12 @@ export default function Report() {
   useEffect(() => {
     console.log("All reports:", reports.length);
     if (reports.length > 0) {
-      setIsLoading(!isLoading);
+      setIsLoading((current) => {
+        if (current) {
+          return false;
+        }
+        return false;
+      });
     }
   }, [reports]);
 
@@ -153,7 +156,7 @@ export default function Report() {
       </Flex>{" "}
       {/* tabs */}
       <Box>
-        <SearchReports />
+        <SearchReports setReports={setReports} />
       </Box>
       <Tabs variant="unstyled" position="relative" onChange={handleTabChange}>
         <TabList justifyContent="center">
@@ -169,7 +172,7 @@ export default function Report() {
 
         <TabPanels>
           <TabPanel>
-          
+            {isLoading && <LoadingWidget />}
             <Wrap
               mx={{ base: "auto", md: "80px" }}
               p={{ base: "0", md: "32px" }}
@@ -185,6 +188,7 @@ export default function Report() {
                       time={report.timeNow}
                       location={report.location}
                       href={"#"}
+                      target={"report"}
                       id={report.id}
                       description={report.description}
                     />
@@ -210,6 +214,7 @@ export default function Report() {
                       location={report.location}
                       href={"#"}
                       id={report.id}
+                      target={"report_drivers"}
                       description={report.description}
                       companyName={report.companyName}
                     />

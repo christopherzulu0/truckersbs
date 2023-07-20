@@ -24,6 +24,7 @@ const Card = ({
   location,
   imageSrc,
   href,
+  target,
   id,
 }) => {
   const [timeOfDay, setTimeOfDay] = useState("AM");
@@ -41,7 +42,7 @@ const Card = ({
   const town = location.split(/[,]/)[1].split(/[\d]/)[0];
   return (
     <Box
-      w={{ md: "lg" }}
+      w={{ md: "100" }}
       borderWidth="1px"
       borderRadius="10px"
       overflow="hidden"
@@ -49,12 +50,12 @@ const Card = ({
     >
       <Stack align="start" spacing="2">
         <Flex align={"center"} justify={"center"} objectFit="contain">
-          <Image src={imageSrc} alt={"Image description"} width={"lg"} />
+          <Image src={imageSrc} alt={"Image description"} width={"sm"} />
         </Flex>
         <Box>
           <Heading
             fontSize="32"
-            lineHeight="30px"
+            lineHeight="20px"
             fontWeight="600"
             size="md"
             style={{ marginTop: "35px" }}
@@ -84,7 +85,7 @@ const Card = ({
           colorScheme={"blue"}
           size={"sm"}
         >
-          <Link href={`/ReportDetails/${id}`}>
+          <Link href={`/ReportDetails/${id}?target=${target}`}>
             <HStack>
               <Text>Read More</Text>
               <AiOutlineArrowRight style={{ marginLeft: "5px" }} />
