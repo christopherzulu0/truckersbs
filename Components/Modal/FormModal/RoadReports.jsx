@@ -1,12 +1,21 @@
 import ModalWrapper from "../ModalWrapper";
-import { useState } from "react";
-
-import { getFirestore, collection, addDoc } from "firebase/firestore";
+import { useState, useEffect } from "react";
+import { LoadingWidget } from "../../../pages/Reports.js";
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  doc,
+  setDoc,
+} from "firebase/firestore";
 import { getStorage, getDownloadURL, ref, uploadBytes } from "firebase/storage";
 
 //for google maps real location
 import { LoadScript, Marker, GoogleMap } from "@react-google-maps/api";
 
+import { auth } from "../../../firebase/clientApp.ts";
+
+import { useAuthState } from "react-firebase-hooks/auth";
 import {
   Box,
   Flex,
@@ -27,6 +36,8 @@ import {
   Textarea,
 } from "@chakra-ui/react";
 
+// component starts here
+
 export default function FormTriggerBtn({ getReports }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [companyName, setCompanyName] = useState("");
@@ -37,6 +48,8 @@ export default function FormTriggerBtn({ getReports }) {
   const [description, setDescription] = useState("");
   const [image, setImage] = useState(null);
   const [caption, setCaption] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [docRefId, setDocRefId] = useState(null);
 
   const handleInputChange = (e) => {
     const file = e.target.files[0];
@@ -44,12 +57,13 @@ export default function FormTriggerBtn({ getReports }) {
   };
 
   const handleLocationClick = () => {
+    let googleMapsApiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
     navigator.geolocation.getCurrentPosition(
       async (position) => {
         const { latitude, longitude } = position.coords;
         setLocation(`${latitude}, ${longitude}`);
         const response = await fetch(
-          `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=AIzaSyDtgjIl85v3STNcvO9InTMy_4XfDp_VoL8`
+          `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${googleMapsApiKey}`
         );
         const data = await response.json();
         const { results } = data;
@@ -88,17 +102,16 @@ export default function FormTriggerBtn({ getReports }) {
     setTime((time) => ({ ...time, ...timeObj }));
   };
 
-  // pic the
-
-  // automatically set the time
+  
+  const [user] = useAuthState(auth);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // let [hours, minutes] = [currentTime.getHours(), currentTime.getMinutes()];
-    // Process the form data here\
+    const [createdBy] = user.providerData;
+    console.log("createdBy: ", createdBy);
 
-    // handleTimeSetting();
+    // Process the form data here
 
     console.log("Company Name:", companyName);
     console.log("Location:", location);
@@ -107,11 +120,13 @@ export default function FormTriggerBtn({ getReports }) {
     console.log("Image:", image);
 
     try {
+      console.log(loading);
       // Upload image to Firebase Storage
       const storageRef = ref(getStorage(), "ReportImages/" + image.name);
       const uploadRslt = await uploadBytes(storageRef, image);
+      setDocRefId(uploadRslt);
+
       const downloadUrl = await getDownloadURL(uploadRslt.ref);
-      console.log(downloadUrl);
 
       // Create document in Firestore
       const db = getFirestore();
@@ -124,26 +139,34 @@ export default function FormTriggerBtn({ getReports }) {
         dateTime: time.dateTime,
         date: time.date,
         description,
+        createdBy,
       });
 
       console.log("Document created with ID:", docRef.id);
       getReports(3);
     } catch (error) {
       console.error("Error creating document:", error);
-    } finally {
-      //make sure that every field is reset
-      setImage("");
-      setLocation("");
-      setCompanyName("");
-      setTime("");
     }
     // Close the modal
 
     onClose();
   };
 
-  //
-  const handleOpen = () => {};
+  useEffect(() => {
+    if (docRefId) {
+      setLoading(!loading);
+    }
+  }, [docRefId]);
+
+  const clearData = () => {
+    setDocRefId(null);
+    setLoading((current) => {
+      if (current) {
+        return false;
+      }
+      return false;
+    });
+  };
 
   return (
     <>
@@ -151,6 +174,7 @@ export default function FormTriggerBtn({ getReports }) {
         h="55px"
         bg="#6484FB"
         onClick={async () => {
+          clearData();
           await handleLocationClick();
           handleTimeSetting();
           onOpen();
@@ -158,6 +182,7 @@ export default function FormTriggerBtn({ getReports }) {
       >
         Make a Report
       </Button>
+
       <ModalWrapper
         borderRadius="30px"
         p="10px"
@@ -165,67 +190,64 @@ export default function FormTriggerBtn({ getReports }) {
         onClose={onClose}
       >
         <>
-          <ModalHeader>Form</ModalHeader>
+          <ModalHeader>Give Road Report</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <form onSubmit={handleSubmit}>
-              <FormControl mb={4}>
-                <FormLabel>Image Attachment</FormLabel>
-                <Input
-                  type="file"
-                  outline="none"
-                  onChange={handleInputChange}
-                  accept="image/*"
-                />
-              </FormControl>
-              <FormControl mb={4}>
-                <FormLabel>Caption</FormLabel>
-                <Input
-                  value={caption}
-                  onChange={(e) => setCaption(e.target.value)}
-                />
-              </FormControl>
-              <FormControl mb={4}>
-                <FormLabel>Company Name</FormLabel>
-                <Input
-                  value={companyName}
-                  onChange={(e) => setCompanyName(e.target.value)}
-                />
-              </FormControl>
-              <FormControl mb={4}>
-                <FormLabel>Location</FormLabel>
-                <Box display="flex">
+            {loading && <LoadingWidget />}
+            {!loading && (
+              <form onSubmit={handleSubmit}>
+                <FormControl mb={4}>
+                  <FormLabel>Image Attachment</FormLabel>
                   <Input
-                    value={location}
-                    placeholder="Enter your location or use current"
-                    onChange={(e) => setLocation(e.target.value)}
+                    type="file"
+                    outline="none"
+                    onChange={handleInputChange}
+                    accept="image/*"
                   />
-                </Box>
-              </FormControl>
-              <FormControl mb={4}>
-                <FormLabel>Time</FormLabel>
-                <Input
-                  readOnly={true}
-                  value={time.dateTime}
-                  // onChange={(e) =>
-                  //   // setTime(e.target.value)
-                  //   handleTimeSetting()
-                  // }
-                />
-              </FormControl>
-              <FormControl mb={4}>
-                <FormLabel>Description</FormLabel>
-                <Textarea
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                />
-              </FormControl>
-              <Flex justify="center">
-                <Button type="submit" colorScheme="blue" mr={3}>
-                  Report
-                </Button>
-              </Flex>
-            </form>
+                </FormControl>
+                <FormControl mb={4}>
+                  <FormLabel>Title</FormLabel>
+
+                  <Input
+                    value={caption}
+                    onChange={(e) => setCaption(e.target.value)}
+                  />
+                </FormControl>
+                <FormControl mb={4}>
+                  <FormLabel>Company Name</FormLabel>
+                  <Input
+                    value={companyName}
+                    onChange={(e) => setCompanyName(e.target.value)}
+                  />
+                </FormControl>
+                <FormControl mb={4}>
+                  <FormLabel>Location</FormLabel>
+                  <Box display="flex">
+                    <Input
+                      value={location}
+                      placeholder="Enter your location or use current"
+                      onChange={(e) => setLocation(e.target.value)}
+                    />
+                  </Box>
+                </FormControl>
+                <FormControl mb={4}>
+                  <FormLabel>Time</FormLabel>
+                  <Input readOnly={true} value={time.dateTime} />
+                </FormControl>
+                <FormControl mb={4}>
+                  <FormLabel>Description</FormLabel>
+                  <Textarea
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                  />
+                </FormControl>
+                <Flex justify="center">
+                  <Button type="submit" colorScheme="blue" mr={3}>
+                    Report
+                  </Button>
+                </Flex>
+              </form>
+            )}
           </ModalBody>
         </>
       </ModalWrapper>
