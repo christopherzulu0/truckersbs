@@ -62,7 +62,6 @@ export default function FormTriggerBtn({ getReports }) {
         if (results && results.length > 0) {
           const { formatted_address } = results[0];
           // const { location } = geometry;
-          console.log(formatted_address);
           setLocation(formatted_address);
           setMapCoordinates(location);
         }
@@ -111,7 +110,7 @@ export default function FormTriggerBtn({ getReports }) {
       const db = getFirestore();
       const docRef = await addDoc(collection(db, "report_drivers"), {
         attachment: downloadUrl,
-        caption,
+        caption: caption.trim().toLowerCase(),
         companyName,
         location,
         timeNow: time.timeNow,

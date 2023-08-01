@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { FaArrowCircleRight } from "react-icons/fa";
 
+import AlertDone from "../Components/Alerts/DoneAlert.jsx";
+
 import { GrDocumentUpload } from "react-icons/gr";
 import { getFirestore, collection, getDocs } from "firebase/firestore";
 import ReportCard from "../Components/ReportCard";
@@ -39,8 +41,6 @@ import SearchReports from "../Components/SearchReports.jsx";
 
 import Footer from "../Components/Footer";
 
-// create a loading indicator
-
 export const LoadingWidget = () => {
   return (
     <Box
@@ -56,10 +56,12 @@ export const LoadingWidget = () => {
 
 // main component
 export default function Report() {
-  const [reports, setReports] = useState([]);
+  const [roadReports, setRoadReports] = useState([]);
+  const [driverReports, setDriverReports] = useState([]);
   const [downloadURL, setDownloadURL] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
+  const [isAlertOpen, setIsAlertOpen] = useState(false);
 
   const getAllreports = async () => {
     try {
@@ -73,15 +75,16 @@ export default function Report() {
         querySnapshot.forEach((doc) => {
           allReports.push({ id: doc.id, ...doc.data() });
         });
+        setRoadReports(allReports);
       } else {
         const querySnapshot = await getDocs(collection(db, "report_drivers"));
 
         querySnapshot.forEach((doc) => {
           allReports.push({ id: doc.id, ...doc.data() });
         });
-      }
 
-      setReports(allReports);
+        setDriverReports(allReports);
+      }
 
       console.log("All reports:", allReports, "isLoading:", isLoading);
     } catch (error) {
@@ -93,8 +96,8 @@ export default function Report() {
   }, []);
 
   useEffect(() => {
-    console.log("All reports:", reports.length);
-    if (reports.length > 0) {
+    console.log("All reports:", roadReports.length);
+    if (roadReports.length > 0 || driverReports.length > 0) {
       setIsLoading((current) => {
         if (current) {
           return false;
@@ -102,14 +105,26 @@ export default function Report() {
         return false;
       });
     }
-  }, [reports]);
+  }, [roadReports]);
+
+  useEffect(() => {
+    console.log("All reports:", roadReports.length);
+    if (driverReports.length > 0) {
+      setIsLoading((current) => {
+        if (current) {
+          return false;
+        }
+        return false;
+      });
+    }
+  }, [driverReports]);
 
   useEffect(() => {
     getAllreports();
-    setReports([]);
+    setRoadReports([]);
     setIsLoading(!isLoading);
 
-    if (reports.length > 0) {
+    if (roadReports.length > 0) {
       setIsLoading(!isLoading);
     }
   }, [activeTab]);
@@ -156,7 +171,17 @@ export default function Report() {
       </Flex>{" "}
       {/* tabs */}
       <Box>
-        <SearchReports setReports={setReports} />
+        <SearchReports
+          setRoadReports={setRoadReports}
+          activeTab={activeTab}
+          setDriverReports={setDriverReports}
+          setIsAlertOpen={setIsAlertOpen}
+        />
+        <AlertDone
+          getReports={getAllreports}
+          isAlertOpen={isAlertOpen}
+          setIsAlertOpen={setIsAlertOpen}
+        />
       </Box>
       <Tabs variant="unstyled" position="relative" onChange={handleTabChange}>
         <TabList justifyContent="center">
@@ -170,15 +195,16 @@ export default function Report() {
           borderRadius="1px"
         />
 
-        <TabPanels>
+        <TabPanels align={"center"}>
           <TabPanel>
             {isLoading && <LoadingWidget />}
             <Wrap
               mx={{ base: "auto", md: "80px" }}
               p={{ base: "0", md: "32px" }}
+              spacing={"10%"}
             >
-              {reports.map((report, idx) => {
-                console.log(report);
+              {roadReports.map((report, idx) => {
+                // console.log(report);
                 return (
                   <WrapItem key={idx}>
                     <ReportCard
@@ -203,7 +229,7 @@ export default function Report() {
               mx={{ base: "auto", md: "80px" }}
               p={{ base: "0", md: "32px" }}
             >
-              {reports.map((report, idx) => {
+              {driverReports.map((report, idx) => {
                 return (
                   <WrapItem key={idx}>
                     <ReportCard

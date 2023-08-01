@@ -25,14 +25,19 @@ import {
   query,
   collection,
   limit,
+  onSnapshot,
   getDocs,
   where,
 } from "firebase/firestore";
 import React, { useState, useEffect } from "react";
 import { AiOutlineSearch } from "react-icons/ai";
-// import { format } from "date-fns";
 
-const SearchPage = ({ setReports }) => {
+const SearchPage = ({
+  setRoadReports,
+  setDriverReports,
+  setIsAlertOpen,
+  activeTab,
+}) => {
   let db = getFirestore();
   const [location, setLocation] = useState("");
   const [time, setTime] = useState("");
@@ -41,30 +46,43 @@ const SearchPage = ({ setReports }) => {
   const [inputType, setInputType] = useState("text");
   const [searchTerm, setSearchTerm] = useState("");
   const handleSearch = () => {
-    console.log(date, time, title, location, searchTerm);
+    console.log(activeTab);
     // Perform the search based on the selected filters
-    fetchReports(title);
+    fetchReports();
   };
 
-  const fetchReports = async (title) => {
+  const fetchReports = async () => {
     try {
-      const q = query(
-        collection(db, "report"),
-        where("caption", "<=", searchTerm)
-        // where("date", "==", date),
-        // where("timeNow", "==", time),
-        // where("location", "==", location),
-        // where("caption", "<=", title)
-      );
-      let tempArray = [];
-      const querySnapshot = await getDocs(q);
-      querySnapshot.forEach((doc) => {
-        tempArray.push({ id: doc.id, ...doc.data() });
-        setReports(tempArray);
-        console.log(doc.data());
-      });
+      const reprtRef = collection(db, "report");
+      const q = query(reprtRef, where("caption", "==", searchTerm));
 
-      // setRelatedReports(tempArray);
+      const reportDriverRef = collection(db, "report_drivers");
+
+      const q1 = query(reportDriverRef, where("caption", "==", searchTerm));
+      let tempArray = [];
+
+      if (activeTab === 0) {
+        const querySnapshot = await getDocs(q);
+        querySnapshot.forEach((doc) => {
+          tempArray.push({ id: doc.id, ...doc.data() });
+          setRoadReports(tempArray);
+          console.log(doc.data());
+        });
+      } else {
+        const querySnapshot = await getDocs(q1);
+        querySnapshot.forEach((doc) => {
+          tempArray.push({ id: doc.id, ...doc.data() });
+          setDriverReports(tempArray);
+          console.log(doc.data());
+        });
+      }
+
+      setSearchTerm("");
+
+      if (tempArray.length == 0) {
+        setIsAlertOpen(true);
+      }
+      console.log(tempArray);
     } catch (error) {
       console.error("Error fetching related posts:", error);
     }
@@ -72,13 +90,11 @@ const SearchPage = ({ setReports }) => {
 
   return (
     <>
-      <>{/* <Tab>Search</Tab> */}</>
-
       <HStack
         style={{
           width: "50%",
           border: "1px solid #F5F7FA",
-          // backgroundColor: "",
+
           margin: "2% auto",
           padding: "14px",
           paddingLeft: "20px",
@@ -89,13 +105,11 @@ const SearchPage = ({ setReports }) => {
         <>
           <InputGroup border="none">
             <FormControl maxW="120px">
-              {/* <FormLabel>Date</FormLabel> */}
               <Input
                 outline="none"
                 border="none"
                 type={inputType}
                 value={time}
-                // onClick={(e) => handleInputToggle()}
                 onChange={(e) => setTime(e.target.value)}
                 placeholder="time"
               />

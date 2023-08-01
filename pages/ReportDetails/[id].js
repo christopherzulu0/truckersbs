@@ -51,9 +51,9 @@ const ReportDetails = () => {
   const [relatedReports, setRelatedReports] = useState([]);
   const [description, setDescription] = useState("");
 
+
   const router = useRouter();
   const { id, target } = router.query;
-
   let db = getFirestore();
 
   const fetchDocument = async () => {
@@ -105,8 +105,10 @@ const ReportDetails = () => {
     }
   };
 
+  useEffect(() => {});
+
   useEffect(() => {
-    fetchDocument();
+    fetchDocument(id);
   }, []);
 
   useEffect(() => {

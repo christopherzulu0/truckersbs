@@ -107,7 +107,6 @@ export default function FormTriggerBtn({ getReports }) {
     e.preventDefault();
 
     const [createdBy] = user.providerData;
-    
 
     // Process the form data here
 
@@ -130,7 +129,7 @@ export default function FormTriggerBtn({ getReports }) {
       const db = getFirestore();
       const docRef = await addDoc(collection(db, "report"), {
         attachment: downloadUrl,
-        caption,
+        caption: caption.trim().toLowerCase(),
         companyName,
         location,
         timeNow: time.timeNow,
@@ -140,8 +139,14 @@ export default function FormTriggerBtn({ getReports }) {
         createdBy,
       });
 
+      setDescription("");
+      setLocation("");
+      setTime({});
+      setCaption("");
+
       console.log("Document created with ID:", docRef.id);
       getReports(3);
+      setA;
     } catch (error) {
       console.error("Error creating document:", error);
     }
